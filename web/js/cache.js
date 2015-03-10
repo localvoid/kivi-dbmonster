@@ -27,12 +27,6 @@ DatabaseCache.prototype.getTopFiveQueries = function(id) {
     queries = queries.slice(0, 5);
     while (queries.length < 5) {
       queries.push({
-        canvas_action: null,
-        canvas_context_id: null,
-        canvas_controller: null,
-        canvas_hostname: null,
-        canvas_job_tag: null,
-        canvas_pid: null,
         elapsed: 0,
         query: '',
         waiting: 0

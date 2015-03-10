@@ -44,12 +44,6 @@ DatabaseStore.prototype.update = function() {
     var r = Math.floor((Math.random() * 10) + 1);
     for (var j = 0; j < r; j++) {
       var q = {
-        canvas_action: null,
-        canvas_context_id: null,
-        canvas_controller: null,
-        canvas_hostname: null,
-        canvas_job_tag: null,
-        canvas_pid: null,
         elapsed: Math.random() * 15,
         query: 'SELECT blah FROM something',
         waiting: Math.random() < 0.5

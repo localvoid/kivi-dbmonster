@@ -73,14 +73,16 @@ var Entry = vdom.declareComponent({
 
       var col = vdom.e('td');
       col.type = 'Query';
-      col.classes = ['elapsed'];
+      var classes = [];
+      classes.push('elapsed');
       if (elapsed >= 10.0) {
-        col.classes.push('warn_long');
+        classes.push('warn_long');
       } else if (elapsed >= 1.0) {
-        col.classes.push('warn');
+        classes.push('warn');
       } else {
-        col.classes.push('short');
+        classes.push('short');
       }
+      col.classes = classes;
       col.children = [text, popover];
       children.push(col);
     }
