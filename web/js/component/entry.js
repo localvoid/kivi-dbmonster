@@ -3,7 +3,6 @@
 var kivi = require('kivi');
 var vdom = kivi.vdom;
 
-var app = require('../app');
 var Popover = require('./popover');
 
 function _formatElapsed(v) {
@@ -29,18 +28,9 @@ var _SUCCESS_CLASS = ['label-success'];
 var Entry = vdom.declareComponent({
   tag: 'tr',
 
-  updateState: function() {
-    var queries = app.cache.getTopFiveQueries(this.props.db.data.id);
-    this.state.sub(queries);
-    this.state.data = {
-      topFiveQueries: queries.data
-    };
-    this.state.update(true);
-  },
-
   build: function() {
-    var db = this.props.db.data;
-    var topFiveQueries = this.state.data.topFiveQueries;
+    var db = this.props.db;
+    var topFiveQueries = db.getTopFiveQueries();
 
     var name = vdom.e('td');
     name.type = 'dbname';

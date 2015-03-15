@@ -1,29 +1,37 @@
 'use strict';
 
-var INTERVAL = 0;
-var DATABASE_COUNT = 100;
+var I = 0;
+var N = 100;
 
 var kivi = require('kivi');
 var Scheduler = require('kivi/lib/scheduler');
 
-var app = require('./app');
-var Store = require('./store');
-var Cache = require('./cache');
+var data = require('./data');
 var Main = require('./component/main');
+
+function update(dbs) {
+  for (var i = 0; i < dbs.length; i++) {
+    dbs[i].update();
+  }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   kivi.init(new Scheduler());
 
-  app.store = new Store(DATABASE_COUNT);
-  app.cache = new Cache();
+  var dbs = [];
+  for (var i = 0; i < N; i++) {
+    dbs.push(new data.Database('cluster' + i));
+    dbs.push(new data.Database('cluster' + i + 'slave'));
+  }
+
+  var main = kivi.vdom.createComponent(Main, {dbs: dbs});
 
   setInterval(function() {
-    kivi.action(function() {
-      app.store.update();
-    });
-  }, INTERVAL);
+    update(dbs);
+    main.invalidate();
+  }, I);
 
   kivi.nextFrame().write(function() {
-    kivi.vdom.injectComponent(kivi.vdom.createComponent(Main), document.body);
+    kivi.vdom.injectComponent(main, document.body);
   });
 });
