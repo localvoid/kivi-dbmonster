@@ -7,6 +7,8 @@ var Entry = require('./entry');
 var _ROOT_CLASSES = ['table', 'table-striped', 'latest-data'];
 
 var Main = vdom.declareComponent({
+  flags: vdom.Component.DISABLE_PROPS_CHECK,
+
   tag: 'table',
 
   build: function() {

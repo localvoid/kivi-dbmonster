@@ -26,6 +26,8 @@ var _WARNING_CLASS = ['label-warning'];
 var _SUCCESS_CLASS = ['label-success'];
 
 var Entry = vdom.declareComponent({
+  flags: vdom.Component.DISABLE_PROPS_CHECK,
+
   tag: 'tr',
 
   build: function() {
