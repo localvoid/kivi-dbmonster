@@ -16,6 +16,10 @@ function update(dbs) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  main();
+});
+
+function main() {
   kivi.init(new Scheduler());
 
   var dbs = [];
@@ -24,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dbs.push(new data.Database('cluster' + i + 'slave'));
   }
 
-  var main = kivi.vdom.createComponent(Main, {dbs: dbs});
+  var main = new Main(null, dbs, null);
 
   setInterval(function() {
     update(dbs);
@@ -34,4 +38,4 @@ document.addEventListener('DOMContentLoaded', function() {
   kivi.nextFrame().write(function() {
     kivi.vdom.injectComponent(main, document.body);
   });
-});
+}
