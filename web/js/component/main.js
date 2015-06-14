@@ -1,34 +1,54 @@
-'use strict';
+goog.provide('app.ui.main');
+goog.require('vdom');
+goog.require('app.ui.entry');
 
-var kivi = require('kivi');
-var vdom = kivi.vdom;
-var Entry = require('./entry');
+/**
+ * @param {!Array<!app.data.Database>} dbs
+ * @param {number} interval
+ * @constructor
+ * @struct
+ * @final
+ */
+app.ui.main.Data = function(dbs, interval) {
+  this.dbs = dbs;
+  this.interval = interval;
+};
 
-var _ROOT_CLASSES = ['table', 'table-striped', 'latest-data'];
+/** @type {!vdom.CDescriptor<!app.ui.main.Data, null>} */
+app.ui.main.d = new vdom.CDescriptor();
+app.ui.main.d.tag = 'table';
 
-function Main(context, data, children) {
-  vdom.Component.call(this, context, data, children);
-}
-kivi.inherits(Main, vdom.Component);
+/** @param {!vdom.Component<!app.ui.main.Data, null>} c */
+app.ui.main.d.init = function(c) {
+  setInterval(function() {
+    var dbs = c.data.dbs;
+    for (var i = 0; i < dbs.length; i++) {
+      dbs[i].update();
+    }
+    c.invalidate();
+  }, c.data.interval);
+};
 
-Main.prototype.tag = 'table';
-
-Main.prototype.updateView = function() {
-  var dbs = this.data;
+/** @param {!vdom.Component<!app.ui.main.Data, null>} c */
+app.ui.main.d.update = function(c) {
+  var dbs = c.data.dbs;
 
   var rows = [];
   for (var i = 0; i < dbs.length; i++) {
     var db = dbs[i];
-    rows.push(vdom.$c(db.id, Entry, {db: db}));
+    rows.push(vdom.createIComponent(db.id, app.ui.entry.d, new app.ui.entry.Data(db)));
   }
 
-  var tbody = vdom.e('tbody');
+  var tbody = vdom.createElement('tbody');
   tbody.children = rows;
-  var root = vdom.r();
-  root.classes = _ROOT_CLASSES;
+  var root = vdom.createRoot();
+  root.classes = app.ui.main.ROOT_CLASSES;
   root.children = [tbody];
-
-  this.updateRoot(root);
+  c.updateRoot(root);
 };
 
-module.exports = Main;
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.main.ROOT_CLASSES = ['table', 'table-striped', 'latest-data'];

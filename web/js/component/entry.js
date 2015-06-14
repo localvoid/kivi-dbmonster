@@ -1,59 +1,47 @@
-'use strict';
+goog.provide('app.ui.entry');
+goog.require('vdom');
+goog.require('app.data');
+goog.require('app.ui.popover');
 
-var kivi = require('kivi');
-var vdom = kivi.vdom;
+/**
+ * @param {!app.data.Database} db
+ * @constructor
+ * @struct
+ * @final
+ */
+app.ui.entry.Data = function(db) {
+  this.db = db;
+};
 
-var Popover = require('./popover');
+/** @type {!vdom.CDescriptor<!app.ui.entry.Data, null>} */
+app.ui.entry.d = new vdom.CDescriptor();
+app.ui.entry.d.tag = 'tr';
 
-function _formatElapsed(v) {
-  if (!v) return '';
+/** @param {!vdom.Component<!app.ui.entry.Data, null>} c */
+app.ui.entry.d.update = function(c) {
+  var data = c.data;
+  var db = data.db;
 
-  var str = parseFloat(v).toFixed(2);
-
-  if (v > 60) {
-    var minutes = Math.floor(v / 60);
-    var comps = (value % 60).toFixed(2).split('.');
-    var seconds = comps[0].lpad('0', 2);
-    var ms = comps[1];
-    str = minutes + ":" + seconds + "." + ms;
-  }
-
-  return str;
-}
-
-var _IMPORTANT_CLASS = ['label-important'];
-var _WARNING_CLASS = ['label-warning'];
-var _SUCCESS_CLASS = ['label-success'];
-
-function Entry(context, data, children) {
-  vdom.Component.call(this, context, data, children);
-}
-kivi.inherits(Entry, vdom.Component);
-
-Entry.prototype.tag = 'tr';
-
-Entry.prototype.updateView = function() {
-  var db = this.data.db;
   var topFiveQueries = db.getTopFiveQueries();
 
-  var name = vdom.e('td');
+  var name = vdom.createElement('td');
   name.type = 'dbname';
-  name.children = [vdom.t(db.name)];
+  name.children = [vdom.createText(db.name)];
 
   var count = db.queries.length;
 
-  var qcSpan = vdom.e('span');
+  var qcSpan = vdom.createElement('span');
   qcSpan.type = 'label';
-  qcSpan.children = [vdom.t(count)];
+  qcSpan.children = [vdom.createText(count.toString())];
   if (count >= 20) {
-    qcSpan.classes = _IMPORTANT_CLASS;
+    qcSpan.classes = app.ui.entry.IMPORTANT_CLASS;
   } else if (count >= 10) {
-    qcSpan.classes = _WARNING_CLASS;
+    qcSpan.classes = app.ui.entry.WARNING_CLASS;
   } else {
-    qcSpan.classes = _SUCCESS_CLASS;
+    qcSpan.classes = app.ui.entry.SUCCESS_CLASS;
   }
 
-  var qc = vdom.e('td');
+  var qc = vdom.createElement('td');
   qc.type = 'query-count';
   qc.children = [qcSpan];
 
@@ -62,10 +50,10 @@ Entry.prototype.updateView = function() {
   for (var i = 0; i < 5; i++) {
     var q = topFiveQueries[i];
     var elapsed = q.elapsed;
-    var text = vdom.t(_formatElapsed(elapsed));
-    var popover = vdom.c(Popover, {query: q.query});
+    var text = vdom.createText(app.ui.entry.formatElapsed(elapsed));
+    var popover = vdom.createComponent(app.ui.popover.d, new app.ui.popover.Data(q.query));
 
-    var col = vdom.e('td');
+    var col = vdom.createElement('td');
     col.type = 'Query';
     var classes = [];
     classes.push('elapsed');
@@ -81,10 +69,47 @@ Entry.prototype.updateView = function() {
     children.push(col);
   }
 
-  var root = vdom.r();
+  var root = vdom.createRoot();
   root.children = children;
 
-  this.updateRoot(root);
+  c.updateRoot(root);
 };
 
-module.exports = Entry;
+/**
+ * @protected
+ * @param {number} v
+ * @returns {string}
+ */
+app.ui.entry.formatElapsed = function(v) {
+  if (!v) return '';
+
+  var str = parseFloat(v).toFixed(2);
+
+  if (v > 60) {
+    var minutes = Math.floor(v / 60);
+    var comps = (v % 60).toFixed(2).split('.');
+    var seconds = comps[0];
+    var ms = comps[1];
+    str = minutes + ":" + seconds + "." + ms;
+  }
+
+  return str;
+};
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.entry.IMPORTANT_CLASS = ['label-important'];
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.entry.WARNING_CLASS = ['label-warning'];
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.entry.SUCCESS_CLASS = ['label-success'];
