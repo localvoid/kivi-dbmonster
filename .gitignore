@@ -5,6 +5,9 @@ build
 # Tern
 .tern-port
 
+# gulp-gh-deploy
+.publish
+
 # Mac
 .DS_Store
 

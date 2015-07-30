@@ -25,7 +25,8 @@ app.ui.main.d.init = function(c) {
     for (var i = 0; i < dbs.length; i++) {
       dbs[i].update();
     }
-    c.invalidate();
+    app.ui.main.d.update(c);
+    window['Monitoring']['renderRate']['ping']();
   }, c.data.interval);
 };
 
@@ -36,7 +37,7 @@ app.ui.main.d.update = function(c) {
   var rows = [];
   for (var i = 0; i < dbs.length; i++) {
     var db = dbs[i];
-    rows.push(vdom.createIComponent(db.id, app.ui.entry.d, new app.ui.entry.Data(db)));
+    rows.push(vdom.createComponent(app.ui.entry.d, new app.ui.entry.Data(db)));
   }
 
   var tbody = vdom.createElement('tbody');

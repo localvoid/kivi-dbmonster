@@ -23,6 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   kivi.env.scheduler.nextFrame().write(function() {
-    vdom.injectComponent(app.ui.main.d, new app.ui.main.Data(dbs, app.I), document.body);
+    vdom.injectComponent(app.ui.main.d, new app.ui.main.Data(dbs, app.I), document.getElementById('app'));
   });
 });
