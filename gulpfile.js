@@ -55,7 +55,7 @@ gulp.task('styles', function() {
 gulp.task('serve', ['default'], function() {
   browserSync({
     open: false,
-    port: BROWSERSYNC_PORT,
+    port: 3000,
     notify: false,
     server: 'build'
   });
