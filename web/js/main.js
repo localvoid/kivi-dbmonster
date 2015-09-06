@@ -1,8 +1,5 @@
 goog.provide('app');
 goog.require('kivi');
-goog.require('kivi.env');
-goog.require('kivi.Scheduler');
-goog.require('vdom');
 goog.require('app.data');
 goog.require('app.ui.main');
 
@@ -22,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dbs.push(new app.data.Database('cluster' + i + 'slave'));
   }
 
-  kivi.env.scheduler.nextFrame().write(function() {
-    vdom.injectComponent(app.ui.main.d, new app.ui.main.Data(dbs, app.I), document.getElementById('app'));
+  kivi.nextFrame().write(function() {
+    kivi.injectComponent(app.ui.main.d, new app.ui.main.Data(dbs, app.I), document.getElementById('app'));
   });
 });

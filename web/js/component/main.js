@@ -1,5 +1,5 @@
 goog.provide('app.ui.main');
-goog.require('vdom');
+goog.require('kivi');
 goog.require('app.ui.popover');
 
 /**
@@ -14,11 +14,11 @@ app.ui.main.Data = function(dbs, interval) {
   this.interval = interval;
 };
 
-/** @type {!vdom.CDescriptor<!app.ui.main.Data, null>} */
-app.ui.main.d = new vdom.CDescriptor();
+/** @type {!kivi.CDescriptor<!app.ui.main.Data, null>} */
+app.ui.main.d = new kivi.CDescriptor();
 app.ui.main.d.tag = 'table';
 
-/** @param {!vdom.Component<!app.ui.main.Data, null>} c */
+/** @param {!kivi.Component<!app.ui.main.Data, null>} c */
 app.ui.main.d.init = function(c) {
   function xx() {
     var dbs = c.data.dbs;
@@ -32,7 +32,7 @@ app.ui.main.d.init = function(c) {
   xx();
 };
 
-/** @param {!vdom.Component<!app.ui.main.Data, null>} c */
+/** @param {!kivi.Component<!app.ui.main.Data, null>} c */
 app.ui.main.d.update = function(c) {
   var dbs = c.data.dbs;
 
@@ -43,27 +43,27 @@ app.ui.main.d.update = function(c) {
     var count = db.queries.length;
 
     var children = [
-      vdom.createElement('td').type('dbname').children(db.name),
-      vdom.createElement('td').type('query-count').children([
-        vdom.createElement('span').type('label').classes(app.ui.main.counterClasses(count)).children('' + count)
+      kivi.createElement('td').type('dbname').children(db.name),
+      kivi.createElement('td').type('query-count').children([
+        kivi.createElement('span').type('label').classes(app.ui.main.counterClasses(count)).children('' + count)
       ])
     ];
     for (var j = 0; j < 5; j++) {
       var q = topFiveQueries[j];
       var elapsed = q.elapsed;
 
-      children.push(vdom.createElement('td').type('Query').classes(app.ui.main.queryClasses(elapsed)).children([
-        vdom.createText(app.ui.main.entryFormatElapsed(elapsed)),
-        vdom.createComponent(app.ui.popover.d, new app.ui.popover.Data(q.query))
+      children.push(kivi.createElement('td').type('Query').classes(app.ui.main.queryClasses(elapsed)).children([
+        kivi.createText(app.ui.main.entryFormatElapsed(elapsed)),
+        kivi.createComponent(app.ui.popover.d, new app.ui.popover.Data(q.query))
       ]));
     }
 
-    rows[i] = vdom.createElement('tr').children(children);
+    rows[i] = kivi.createElement('tr').children(children);
   }
 
-  c.updateRoot(vdom.createRoot()
+  c.syncVRoot(kivi.createRoot()
       .classes(app.ui.main.ROOT_CLASSES)
-      .children([vdom.createElement('tbody').children(rows)]));
+      .children([kivi.createElement('tbody').children(rows)]));
 };
 
 /**

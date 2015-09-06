@@ -1,5 +1,5 @@
 goog.provide('app.ui.popover');
-goog.require('vdom');
+goog.require('kivi');
 
 /**
  * @param {string} query
@@ -11,15 +11,15 @@ app.ui.popover.Data = function(query) {
   this.query = query;
 };
 
-/** @type {!vdom.CDescriptor<!app.ui.popover.Data, null>} */
-app.ui.popover.d = new vdom.CDescriptor();
+/** @type {!kivi.CDescriptor<!app.ui.popover.Data, null>} */
+app.ui.popover.d = new kivi.CDescriptor();
 
-/** @param {!vdom.Component<!app.ui.popover.Data, null>} c */
+/** @param {!kivi.Component<!app.ui.popover.Data, null>} c */
 app.ui.popover.d.update = function(c) {
-  c.updateRoot(vdom.createRoot().classes(app.ui.popover.ROOT_CLASSES)
+  c.syncVRoot(kivi.createRoot().classes(app.ui.popover.ROOT_CLASSES)
       .children([
-        vdom.createElement('div').type('popover-content').children(c.data.query),
-        vdom.createElement('div').type('arrow')
+        kivi.createElement('div').type('popover-content').children(c.data.query),
+        kivi.createElement('div').type('arrow')
       ]));
 };
 
