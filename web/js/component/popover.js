@@ -12,7 +12,7 @@ app.ui.popover.Data = function(query) {
 };
 
 /** @type {!kivi.CDescriptor<!app.ui.popover.Data, null>} */
-app.ui.popover.d = new kivi.CDescriptor();
+app.ui.popover.d = new kivi.CDescriptor('Popover');
 
 /** @param {!kivi.Component<!app.ui.popover.Data, null>} c */
 app.ui.popover.d.update = function(c) {
@@ -25,6 +25,6 @@ app.ui.popover.d.update = function(c) {
 
 /**
  * @protected
- * @const {Array<string>}
+ * @const {!Array<string>}
  */
 app.ui.popover.ROOT_CLASSES = ['popover', 'left'];

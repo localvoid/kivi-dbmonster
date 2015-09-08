@@ -51,7 +51,7 @@ app.data.Database = function(name) {
   this.id = app.data._nextId++;
   this.name = name;
 
-  /** @type {Array<!app.data.Query>} */
+  /** @type {?Array<!app.data.Query>} */
   this.queries = null;
 
   this.update();

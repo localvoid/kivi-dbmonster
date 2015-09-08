@@ -29,7 +29,7 @@ gulp.task('scripts', function() {
         only_closure_dependencies: true,
         output_wrapper: '(function(){%output%}).call();',
         warning_level: 'VERBOSE',
-        jscomp_warning: 'reportUnknownTypes',
+        jscomp_warning: '*',
         summary_detail_level: 3
       }
     }))

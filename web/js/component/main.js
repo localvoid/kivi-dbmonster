@@ -1,6 +1,6 @@
 goog.provide('app.ui.main');
-goog.require('kivi');
 goog.require('app.ui.popover');
+goog.require('kivi');
 
 /**
  * @param {!Array<!app.data.Database>} dbs
@@ -15,7 +15,7 @@ app.ui.main.Data = function(dbs, interval) {
 };
 
 /** @type {!kivi.CDescriptor<!app.ui.main.Data, null>} */
-app.ui.main.d = new kivi.CDescriptor();
+app.ui.main.d = new kivi.CDescriptor('Main');
 app.ui.main.d.tag = 'table';
 
 /** @param {!kivi.Component<!app.ui.main.Data, null>} c */
@@ -90,7 +90,7 @@ app.ui.main.entryFormatElapsed = function(v) {
 /**
  * @param {number} count
  * @protected
- * @return {Array<string>}
+ * @return {!Array<string>}
  */
 app.ui.main.counterClasses = function(count) {
   if (count >= 20) {
@@ -104,7 +104,7 @@ app.ui.main.counterClasses = function(count) {
 /**
  * @param {number} elapsed
  * @protected
- * @return {Array<string>}
+ * @return {!Array<string>}
  */
 app.ui.main.queryClasses = function(elapsed) {
   if (elapsed >= 10.0) {
