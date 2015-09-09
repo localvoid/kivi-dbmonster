@@ -3,25 +3,55 @@ goog.require('app.ui.popover');
 goog.require('kivi');
 
 /**
- * @param {!Array<!app.data.Database>} dbs
- * @param {number} interval
- * @constructor
- * @struct
- * @final
+ * @protected
+ * @const {!Array<string>}
  */
-app.ui.main.Data = function(dbs, interval) {
-  this.dbs = dbs;
-  this.interval = interval;
-};
+app.ui.main.QUERY_CLASSES_WARN_LONG = ['elapsed', 'warn_long'];
 
-/** @type {!kivi.CDescriptor<!app.ui.main.Data, null>} */
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.main.QUERY_CLASSES_WARN = ['elapsed', 'warn'];
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.main.QUERY_CLASSES_SHORT = ['elapsed', 'short'];
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.main.ROOT_CLASSES = ['table', 'table-striped', 'latest-data'];
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.main.ENTRY_IMPORTANT_CLASS = ['label-important'];
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.main.ENTRY_WARNING_CLASS = ['label-warning'];
+
+/**
+ * @protected
+ * @const {!Array<string>}
+ */
+app.ui.main.ENTRY_SUCCESS_CLASS = ['label-success'];
+
+/** @type {!kivi.CDescriptor<!Array<!app.data.Database>, null>} */
 app.ui.main.d = new kivi.CDescriptor('Main');
 app.ui.main.d.tag = 'table';
 
-/** @param {!kivi.Component<!app.ui.main.Data, null>} c */
+/** @param {!kivi.Component<!Array<!app.data.Database>, null>} c */
 app.ui.main.d.init = function(c) {
   function xx() {
-    var dbs = c.data.dbs;
+    var dbs = c.data;
     for (var i = 0; i < dbs.length; i++) {
       dbs[i].update();
     }
@@ -32,9 +62,9 @@ app.ui.main.d.init = function(c) {
   xx();
 };
 
-/** @param {!kivi.Component<!app.ui.main.Data, null>} c */
+/** @param {!kivi.Component<!Array<!app.data.Database>, null>} c */
 app.ui.main.d.update = function(c) {
-  var dbs = c.data.dbs;
+  var dbs = c.data;
 
   var rows = new Array(dbs.length);
   for (var i = 0; i < dbs.length; i++) {
@@ -54,7 +84,7 @@ app.ui.main.d.update = function(c) {
 
       children.push(kivi.createElement('td').type('Query').classes(app.ui.main.queryClasses(elapsed)).children([
         kivi.createText(app.ui.main.entryFormatElapsed(elapsed)),
-        kivi.createComponent(app.ui.popover.d, new app.ui.popover.Data(q.query))
+        kivi.createComponent(app.ui.popover.d, q.query)
       ]));
     }
 
@@ -114,45 +144,3 @@ app.ui.main.queryClasses = function(elapsed) {
   }
   return app.ui.main.QUERY_CLASSES_SHORT;
 };
-
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.QUERY_CLASSES_WARN_LONG = ['elapsed', 'warn_long'];
-
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.QUERY_CLASSES_WARN = ['elapsed', 'warn'];
-
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.QUERY_CLASSES_SHORT = ['elapsed', 'short'];
-
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.ROOT_CLASSES = ['table', 'table-striped', 'latest-data'];
-
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.ENTRY_IMPORTANT_CLASS = ['label-important'];
-
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.ENTRY_WARNING_CLASS = ['label-warning'];
-
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.ENTRY_SUCCESS_CLASS = ['label-success'];
