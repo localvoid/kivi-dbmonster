@@ -88,7 +88,7 @@ app.ui.main.d.update = function(c) {
       ]));
     }
 
-    rows[i] = kivi.createElement('tr').children(children);
+    rows[i] = kivi.createElement('tr').disableChildrenShapeError().children(children);
   }
 
   c.syncVRoot(kivi.createRoot()
