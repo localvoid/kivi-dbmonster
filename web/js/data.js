@@ -3,13 +3,11 @@ goog.provide('app.data');
 /**
  *
  * @param {number} elapsed
- * @param {boolean} waiting
  * @param {string} query
  * @constructor
  */
-app.data.Query = function(elapsed, waiting, query) {
+app.data.Query = function(elapsed, query) {
   this.elapsed = elapsed;
-  this.waiting = waiting;
   this.query = query;
 };
 
@@ -19,7 +17,6 @@ app.data.Query = function(elapsed, waiting, query) {
  */
 app.data.Query.rand = function() {
   var elapsed = Math.random() * 15;
-  var waiting = Math.random() < 0.5;
   var query = 'SELECT blah FROM something';
 
   if (Math.random() < 0.2) {
@@ -30,7 +27,7 @@ app.data.Query.rand = function() {
     query = 'vacuum';
   }
 
-  return new app.data.Query(elapsed, waiting, query);
+  return new app.data.Query(elapsed, query);
 };
 
 /**
@@ -72,6 +69,7 @@ app.data.Database.prototype.update = function() {
 };
 
 /**
+ * Get Top Five Queries.
  *
  * @returns {!Array.<!app.data.Query>}
  */
@@ -82,7 +80,39 @@ app.data.Database.prototype.getTopFiveQueries = function() {
   });
   qs = qs.slice(0, 5);
   while (qs.length < 5) {
-    qs.push(new app.data.Query(0.0, false, ''));
+    qs.push(new app.data.Query(0.0, ''));
   }
   return qs;
+};
+
+/**
+ * Database List.
+ *
+ * @param {number} n
+ * @constructor
+ * @struct
+ * @final
+ */
+app.data.DatabaseList = function(n) {
+  /** @type {!Array<!app.data.Database>} */
+  this.dbs = [];
+
+  for (var i = 0; i < n; i++) {
+    this.dbs.push(new app.data.Database('cluster' + i));
+    this.dbs.push(new app.data.Database('cluster' + i + 'slave'));
+  }
+};
+
+/**
+ * Perform random update.
+ *
+ * @param {number} r
+ */
+app.data.DatabaseList.prototype.randomUpdate = function(r) {
+  var dbs = this.dbs;
+  for (var i = 0; i < dbs.length; i++) {
+    if (Math.random() < r) {
+      dbs[i] = new app.data.Database(dbs[i].name);
+    }
+  }
 };

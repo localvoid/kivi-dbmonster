@@ -3,18 +3,39 @@ goog.require('app.data');
 goog.require('app.ui.main');
 goog.require('kivi');
 
+/** @type {number} */
+app.mutations = 0.5;
+
 /** @const {number} */
-app.N = 100;
+app.N = 50;
 
 document.addEventListener('DOMContentLoaded', function() {
-  /** @type {!Array<!app.data.Database>} */
-  var dbs = [];
-  for (var i = 0; i < app.N; i++) {
-    dbs.push(new app.data.Database('cluster' + i));
-    dbs.push(new app.data.Database('cluster' + i + 'slave'));
-  }
+  var dbs = new app.data.DatabaseList(app.N);
 
-  kivi.nextFrame().write(function() {
-    kivi.injectComponent(app.ui.main.d, dbs, /** @type {!Element} */(document.getElementById('app')));
+  var sliderContainer = document.createElement('div');
+  sliderContainer.style.display = 'flex';
+  var slider = document.createElement('input');
+  slider.type = 'range';
+  slider.style.marginBottom = '10px';
+  slider.style.marginTop = '5px';
+  var text = document.createElement('label');
+  text.textContent = 'mutations : ' + (app.mutations * 100).toFixed(0) + '%';
+
+  slider.addEventListener('change', function(e) {
+    app.mutations = /** @type {!HTMLInputElement} */(e.target).value / 100;
+    text.textContent = 'mutations : ' + (app.mutations * 100).toFixed(0) + '%';
   });
+  sliderContainer.appendChild(text);
+  sliderContainer.appendChild(slider);
+  document.body.insertBefore(sliderContainer, document.body.firstChild);
+
+  var c = kivi.injectComponent(app.ui.main.d, dbs, /** @type {!Element} */(document.getElementById('app')));
+
+  function update() {
+    dbs.randomUpdate(app.mutations);
+    app.ui.main.d.update(c);
+    window['Monitoring']['renderRate']['ping']();
+    setTimeout(update, 0);
+  }
+  setTimeout(update, 0);
 });
