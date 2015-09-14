@@ -104,6 +104,16 @@ app.data.DatabaseList = function(n) {
 };
 
 /**
+ * Perform full update.
+ */
+app.data.DatabaseList.prototype.update = function() {
+  var dbs = this.dbs;
+  for (var i = 0; i < dbs.length; i++) {
+    dbs[i] = new app.data.Database(dbs[i].name);
+  }
+};
+
+/**
  * Perform random update.
  *
  * @param {number} r
