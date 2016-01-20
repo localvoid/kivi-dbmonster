@@ -17,14 +17,14 @@ app.data.Query = function(elapsed, query) {
  */
 app.data.Query.rand = function() {
   var elapsed = Math.random() * 15;
-  var query = 'SELECT blah FROM something';
-
-  if (Math.random() < 0.2) {
-    query = '<IDLE> in transaction';
-  }
+  var query;
 
   if (Math.random() < 0.1) {
     query = 'vacuum';
+  } else if (Math.random() < 0.2) {
+    query = '<IDLE> in transaction';
+  } else {
+    query = 'SELECT blah FROM something';
   }
 
   return new app.data.Query(elapsed, query);
@@ -68,6 +68,8 @@ app.data.Database.prototype.update = function() {
   this.queries = queries;
 };
 
+app.data.EMPTY_QUERY = new app.data.Query(0.0, '');
+
 /**
  * Get Top Five Queries.
  *
@@ -80,7 +82,7 @@ app.data.Database.prototype.getTopFiveQueries = function() {
   });
   qs = qs.slice(0, 5);
   while (qs.length < 5) {
-    qs.push(new app.data.Query(0.0, ''));
+    qs.push(app.data.EMPTY_QUERY);
   }
   return qs;
 };

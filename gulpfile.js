@@ -4,35 +4,31 @@ var gulp = require('gulp');
 var gulp_if = require('gulp-if');
 var del = require('del');
 var browserSync = require('browser-sync');
-var closureCompiler = require('gulp-closure-compiler');
+var closureCompiler = require('google-closure-compiler').gulp();
 var ghPages = require('gulp-gh-pages');
 
 var DEST = './build';
 var CLOSURE_OPTS = {
-  compilerPath: 'node_modules/closurecompiler/compiler/compiler.jar',
-  continueWithWarnings: true,
-  compilerFlags: {
-    define: [
-      'kivi.DEBUG=false'
-    ],
-    closure_entry_point: 'app',
-    compilation_level: 'ADVANCED_OPTIMIZATIONS',
-    language_in: 'ECMASCRIPT6_STRICT',
-    language_out: 'ECMASCRIPT5_STRICT',
-    use_types_for_optimization: true,
-    only_closure_dependencies: true,
-    output_wrapper: '(function(){%output%}).call();',
-    warning_level: 'VERBOSE',
-    jscomp_warning: ['*', 'reportUnknownTypes'],
-    summary_detail_level: 3
-  }
+  define: [
+    'kivi.DEBUG=false'
+  ],
+  closure_entry_point: 'app',
+  compilation_level: 'ADVANCED_OPTIMIZATIONS',
+  language_in: 'ECMASCRIPT6_STRICT',
+  language_out: 'ECMASCRIPT5_STRICT',
+  use_types_for_optimization: true,
+  only_closure_dependencies: true,
+  output_wrapper: '(function(){%output%}).call();',
+  warning_level: 'VERBOSE',
+  jscomp_warning: ['*', 'reportUnknownTypes'],
+  summary_detail_level: 3
 };
 
 gulp.task('clean', del.bind(null, [DEST]));
 
 gulp.task('js:original', function() {
   var opts = Object.create(CLOSURE_OPTS);
-  opts.fileName = 'original.js';
+  opts['js_output_file'] = 'original.js';
 
   return gulp.src(['web/original.js', 'web/js/**/*.js', 'node_modules/kivi/src/**/*.js'])
       .pipe(closureCompiler(opts))
@@ -42,7 +38,7 @@ gulp.task('js:original', function() {
 
 gulp.task('js:new', function() {
   var opts = Object.create(CLOSURE_OPTS);
-  opts.fileName = 'new.js';
+  opts['js_output_file'] = 'new.js';
 
   return gulp.src(['web/new.js', 'web/js/**/*.js', 'node_modules/kivi/src/**/*.js'])
     .pipe(closureCompiler(opts))
@@ -50,7 +46,17 @@ gulp.task('js:new', function() {
     .pipe(browserSync.reload({stream: true}));
 });
 
-gulp.task('js', ['js:original', 'js:new']);
+gulp.task('js:tablebench', function() {
+  var opts = Object.create(CLOSURE_OPTS);
+  opts['js_output_file'] = 'tablebench.js';
+
+  return gulp.src(['web/tablebench.js', 'web/profiler.js', 'node_modules/kivi/src/**/*.js'])
+      .pipe(closureCompiler(opts))
+      .pipe(gulp.dest(DEST))
+      .pipe(browserSync.reload({stream: true}));
+});
+
+gulp.task('js', ['js:original', 'js:new', 'js:tablebench']);
 
 gulp.task('monitor-js', function() {
   gulp.src(['./web/memory-stats.js', './web/monitor.js'])

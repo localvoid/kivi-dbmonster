@@ -1,27 +1,27 @@
 goog.provide('app.ui.main');
 goog.require('app.ui.database');
-goog.require('kivi');
+goog.require('kivi.CDescriptor');
+goog.require('kivi.Component');
+goog.require('kivi.VNode');
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.main.ROOT_CLASSES = ['table', 'table-striped', 'latest-data'];
+goog.scope(function() {
+  var VNode = kivi.VNode;
 
-/** @type {!kivi.CDescriptor<!app.data.DatabaseList, null>} */
-app.ui.main.d = new kivi.CDescriptor('Main');
-app.ui.main.d.tag = 'table';
+  /** @type {!kivi.CDescriptor<!app.data.DatabaseList, null>} */
+  app.ui.main.d = kivi.CDescriptor.create('Main');
+  app.ui.main.d.tag = 'table';
 
-/** @param {!kivi.Component<!app.data.DatabaseList, null>} c */
-app.ui.main.d.update = function(c) {
-  var dbs = c.data.dbs;
+  /** @param {!kivi.Component<!app.data.DatabaseList, null>} c */
+  app.ui.main.d.update = function(c) {
+    var dbs = c.data.dbs;
 
-  var rows = new Array(dbs.length);
-  for (var i = 0; i < dbs.length; i++) {
-    rows[i] = kivi.createComponent(app.ui.database.d, dbs[i]);
-  }
+    var rows = new Array(dbs.length);
+    for (var i = 0; i < dbs.length; i++) {
+      rows[i] = app.ui.database.create(dbs[i]);
+    }
 
-  c.syncVRoot(kivi.createRoot()
-      .classes(app.ui.main.ROOT_CLASSES)
-      .children([kivi.createElement('tbody').children(rows)]));
-};
+    c.syncVRoot(VNode.createRoot()
+        .classes('table table-striped latest-data')
+        .children([VNode.createElement('tbody').children(rows)]));
+  };
+});

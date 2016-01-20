@@ -1,7 +1,7 @@
 goog.provide('app');
 goog.require('app.data');
 goog.require('app.ui.main');
-goog.require('kivi');
+goog.require('kivi.injectComponent');
 
 /** @const {number} */
 app.N = 100;

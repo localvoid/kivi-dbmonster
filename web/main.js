@@ -2,6 +2,7 @@ goog.provide('app');
 goog.require('app.data');
 goog.require('app.ui.main');
 goog.require('kivi.injectComponent');
+goog.require('pm');
 
 /** @type {number} */
 app.mutations = 0.5;
@@ -10,6 +11,7 @@ app.mutations = 0.5;
 app.N = 50;
 
 document.addEventListener('DOMContentLoaded', function() {
+  pm.init();
   var dbs = new app.data.DatabaseList(app.N);
 
   var sliderContainer = document.createElement('div');
@@ -33,9 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function update() {
     dbs.randomUpdate(app.mutations);
-    app.ui.main.d.update(c);
-    window['Monitoring']['renderRate']['ping']();
-    setTimeout(update, 0);
+    pm.measure('update', function() {
+      app.ui.main.d.update(c);
+    });
+    requestAnimationFrame(update);
   }
-  setTimeout(update, 0);
+  requestAnimationFrame(update);
 });

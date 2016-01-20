@@ -1,117 +1,95 @@
 goog.provide('app.ui.database');
 goog.require('app.ui.popover');
-goog.require('kivi');
+goog.require('kivi.CDescriptor');
+goog.require('kivi.Component');
+goog.require('kivi.VNode');
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.database.QUERY_CLASSES_WARN_LONG = ['elapsed', 'warn_long'];
+goog.scope(function() {
+  var VNode = kivi.VNode;
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.database.QUERY_CLASSES_WARN = ['elapsed', 'warn'];
+  /**
+   * @protected
+   * @param {number} v
+   * @returns {string}
+   */
+  app.ui.database.entryFormatElapsed = function(v) {
+    if (!v) return '';
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.database.QUERY_CLASSES_SHORT = ['elapsed', 'short'];
+    var str = parseFloat(v).toFixed(2);
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.database.ENTRY_IMPORTANT_CLASS = ['label-important'];
+    if (v > 60) {
+      var minutes = Math.floor(v / 60);
+      var comps = (v % 60).toFixed(2).split('.');
+      var seconds = comps[0];
+      var ms = comps[1];
+      str = minutes + ':' + seconds + '.' + ms;
+    }
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.database.ENTRY_WARNING_CLASS = ['label-warning'];
+    return str;
+  };
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.database.ENTRY_SUCCESS_CLASS = ['label-success'];
+  /**
+   * @protected
+   * @param {number} count
+   * @returns {string}
+   */
+  app.ui.database.counterClasses = function(count) {
+    if (count >= 20) {
+      return 'label label-important';
+    } else if (count >= 10) {
+      return 'label label-warning';
+    }
+    return 'label label-success';
+  };
 
-/** @const {!kivi.CDescriptor<!app.data.Database, null>} */
-app.ui.database.d = new kivi.CDescriptor('Database');
-app.ui.database.d.tag = 'tr';
+  /**
+   * @protected
+   * @param {number} elapsed
+   * @returns {string}
+   */
+  app.ui.database.queryClasses = function(elapsed) {
+    if (elapsed >= 10.0) {
+      return 'Query elapsed warn_long';
+    } else if (elapsed >= 1.0) {
+      return 'Query elapsed warn';
+    }
+    return 'Query elapsed short';
+  };
 
-/** @param {!kivi.Component<!app.data.Database, null>} c */
-app.ui.database.d.update = function(c) {
-  var db = c.data;
-  var topFiveQueries = db.getTopFiveQueries();
-  var count = db.queries.length;
+  /** @const {!kivi.CDescriptor<!app.data.Database, null>} */
+  app.ui.database.d = kivi.CDescriptor.create('Database');
+  app.ui.database.d.tag = 'tr';
 
-  var children = [
-    kivi.createElement('td').type('dbname').children(db.name),
-    kivi.createElement('td').type('query-count').children([
-      kivi.createElement('span').type('label').classes(app.ui.database.counterClasses(count)).children('' + count)
-    ])
-  ];
-  for (var i = 0; i < 5; i++) {
-    var q = topFiveQueries[i];
-    var elapsed = q.elapsed;
+  /** @param {!kivi.Component<!app.data.Database, null>} c */
+  app.ui.database.d.update = function(c) {
+    var db = c.data;
+    var topFiveQueries = db.getTopFiveQueries();
+    var count = db.queries.length;
 
-    children.push(kivi.createElement('td').type('Query').classes(app.ui.database.queryClasses(elapsed)).children([
-      kivi.createText(app.ui.database.entryFormatElapsed(elapsed)),
-      kivi.createComponent(app.ui.popover.d, q.query)
-    ]));
-  }
+    var children = [
+      VNode.createElement('td').classes('dbname').children(db.name),
+      VNode.createElement('td').classes('query-count').children([
+        VNode.createElement('span').classes(app.ui.database.counterClasses(count)).children('' + count)
+      ])
+    ];
+    for (var i = 0; i < 5; i++) {
+      var q = topFiveQueries[i];
+      var elapsed = q.elapsed;
 
-  c.syncVRoot(kivi.createRoot().disableChildrenShapeError().children(children));
-};
+      children.push(VNode.createElement('td').classes(app.ui.database.queryClasses(elapsed)).children([
+        VNode.createText(app.ui.database.entryFormatElapsed(elapsed)),
+        app.ui.popover.createVNode(q.query)
+      ]));
+    }
 
-/**
- * @protected
- * @param {number} v
- * @returns {string}
- */
-app.ui.database.entryFormatElapsed = function(v) {
-  if (!v) return '';
+    c.syncVRoot(VNode.createRoot().children(children));
+  };
 
-  var str = parseFloat(v).toFixed(2);
-
-  if (v > 60) {
-    var minutes = Math.floor(v / 60);
-    var comps = (v % 60).toFixed(2).split('.');
-    var seconds = comps[0];
-    var ms = comps[1];
-    str = minutes + ':' + seconds + '.' + ms;
-  }
-
-  return str;
-};
-
-/**
- * @param {number} count
- * @protected
- * @return {!Array<string>}
- */
-app.ui.database.counterClasses = function(count) {
-  if (count >= 20) {
-    return app.ui.database.ENTRY_IMPORTANT_CLASS;
-  } else if (count >= 10) {
-    return app.ui.database.ENTRY_WARNING_CLASS;
-  }
-  return app.ui.database.ENTRY_SUCCESS_CLASS;
-};
-
-/**
- * @param {number} elapsed
- * @protected
- * @return {!Array<string>}
- */
-app.ui.database.queryClasses = function(elapsed) {
-  if (elapsed >= 10.0) {
-    return app.ui.database.QUERY_CLASSES_WARN_LONG;
-  } else if (elapsed >= 1.0) {
-    return app.ui.database.QUERY_CLASSES_WARN;
-  }
-  return app.ui.database.QUERY_CLASSES_SHORT;
-};
+  /**
+   * @param {!app.data.Database} db
+   * @returns {!kivi.VNode}
+   */
+  app.ui.database.create = function(db) {
+    return VNode.createComponent(app.ui.database.d, db);
+  };
+});

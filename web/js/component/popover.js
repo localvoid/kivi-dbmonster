@@ -1,20 +1,28 @@
 goog.provide('app.ui.popover');
-goog.require('kivi');
+goog.require('kivi.CDescriptor');
+goog.require('kivi.Component');
+goog.require('kivi.VNode');
 
-/**
- * @protected
- * @const {!Array<string>}
- */
-app.ui.popover.ROOT_CLASSES = ['popover', 'left'];
+goog.scope(function() {
+  var VNode = kivi.VNode;
 
-/** @type {!kivi.CDescriptor<string, null>} */
-app.ui.popover.d = new kivi.CDescriptor('Popover');
+  /** @const {!kivi.CDescriptor<string, null>} */
+  app.ui.popover.d = kivi.CDescriptor.create('Popover');
+  
+  /** @param {!kivi.Component<string, null>} c */
+  app.ui.popover.d.update = function(c) {
+    c.syncVRoot(VNode.createRoot().classes('popover left')
+        .children([
+          VNode.createElement('div').classes('popover-content').children(c.data),
+          VNode.createElement('div').classes('arrow')
+        ]));
+  };
 
-/** @param {!kivi.Component<string, null>} c */
-app.ui.popover.d.update = function(c) {
-  c.syncVRoot(kivi.createRoot().classes(app.ui.popover.ROOT_CLASSES)
-      .children([
-        kivi.createElement('div').type('popover-content').children(c.data),
-        kivi.createElement('div').type('arrow')
-      ]));
-};
+  /**
+   * @param {string} text
+   * @returns {!kivi.VNode}
+   */
+  app.ui.popover.createVNode = function(text) {
+    return VNode.createComponent(app.ui.popover.d, text);
+  };
+});
