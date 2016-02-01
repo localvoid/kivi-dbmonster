@@ -1,6 +1,5 @@
 goog.provide('app');
 goog.provide('app.ui.main');
-goog.require('app.ui.popover');
 goog.require('kivi.injectComponent');
 goog.require('kivi.CDescriptor');
 goog.require('kivi.Component');
@@ -15,6 +14,10 @@ goog.scope(function() {
 
   app.ui.main._DBNameTag = kivi.CTag.create('td').classes('dbname');
   app.ui.main._QueryCountTag = kivi.CTag.create('td').classes('query-count');
+
+  app.ui.main._PopoverTag = kivi.CTag.create('div').classes('popover left');
+  app.ui.main._ContentTag = kivi.CTag.create('div').classes('popover-content');
+  app.ui.main._ArrowTag = kivi.CTag.create('div').classes('arrow');
 
   /** @param {!kivi.Component<!Array, null>} c */
   app.ui.main.d.update = function(c) {
@@ -37,7 +40,10 @@ goog.scope(function() {
 
         children.push(VNode.createElement('td').classes(q['elapsedClassName']).children([
           VNode.createText(q['formatElapsed']),
-          app.ui.popover.createVNode(q['query'])
+          VNode.createElement(app.ui.main._PopoverTag).children([
+              VNode.createElement(app.ui.main._ContentTag).children(q['query']),
+              VNode.createElement(app.ui.main._ArrowTag)
+          ])
         ]));
       }
 
