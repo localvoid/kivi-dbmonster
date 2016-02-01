@@ -1,6 +1,7 @@
 goog.provide('app.ui.database');
 goog.require('app.ui.popover');
 goog.require('kivi.CDescriptor');
+goog.require('kivi.CTag');
 goog.require('kivi.Component');
 goog.require('kivi.VNode');
 
@@ -60,6 +61,9 @@ goog.scope(function() {
   app.ui.database.d = kivi.CDescriptor.create('Database');
   app.ui.database.d.tag = 'tr';
 
+  app.ui.database._DBNameTag = kivi.CTag.create('td').classes('dbname');
+  app.ui.database._QueryCountTag = kivi.CTag.create('td').classes('query-count');
+
   /** @param {!kivi.Component<!app.data.Database, null>} c */
   app.ui.database.d.update = function(c) {
     var db = c.data;
@@ -67,8 +71,8 @@ goog.scope(function() {
     var count = db.queries.length;
 
     var children = [
-      VNode.createElement('td').classes('dbname').children(db.name),
-      VNode.createElement('td').classes('query-count').children([
+      VNode.createElement(app.ui.database._DBNameTag).children(db.name),
+      VNode.createElement(app.ui.database._QueryCountTag).children([
         VNode.createElement('span').classes(app.ui.database.counterClasses(count)).children('' + count)
       ])
     ];

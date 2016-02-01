@@ -1,6 +1,7 @@
 goog.provide('app.ui.main');
 goog.require('app.ui.database');
 goog.require('kivi.CDescriptor');
+goog.require('kivi.CTag');
 goog.require('kivi.Component');
 goog.require('kivi.VNode');
 
@@ -9,7 +10,7 @@ goog.scope(function() {
 
   /** @type {!kivi.CDescriptor<!app.data.DatabaseList, null>} */
   app.ui.main.d = kivi.CDescriptor.create('Main');
-  app.ui.main.d.tag = 'table';
+  app.ui.main.d.tag = kivi.CTag.create('table').classes('table table-striped latest-data');
 
   /** @param {!kivi.Component<!app.data.DatabaseList, null>} c */
   app.ui.main.d.update = function(c) {
@@ -21,7 +22,6 @@ goog.scope(function() {
     }
 
     c.syncVRoot(VNode.createRoot()
-        .classes('table table-striped latest-data')
         .children([VNode.createElement('tbody').children(rows)]));
   };
 });

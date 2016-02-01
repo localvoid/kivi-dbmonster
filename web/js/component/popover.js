@@ -1,5 +1,6 @@
 goog.provide('app.ui.popover');
 goog.require('kivi.CDescriptor');
+goog.require('kivi.CTag');
 goog.require('kivi.Component');
 goog.require('kivi.VNode');
 
@@ -8,13 +9,17 @@ goog.scope(function() {
 
   /** @const {!kivi.CDescriptor<string, null>} */
   app.ui.popover.d = kivi.CDescriptor.create('Popover');
+  app.ui.popover.d.tag = kivi.CTag.create('div').classes('popover left');
+
+  app.ui.popover._ContentTag = kivi.CTag.create('div').classes('popover-content');
+  app.ui.popover._ArrowTag = kivi.CTag.create('div').classes('arrow');
   
   /** @param {!kivi.Component<string, null>} c */
   app.ui.popover.d.update = function(c) {
-    c.syncVRoot(VNode.createRoot().classes('popover left')
+    c.syncVRoot(VNode.createRoot()
         .children([
-          VNode.createElement('div').classes('popover-content').children(c.data),
-          VNode.createElement('div').classes('arrow')
+          VNode.createElement(app.ui.popover._ContentTag).children(c.data),
+          VNode.createElement(app.ui.popover._ArrowTag)
         ]));
   };
 
