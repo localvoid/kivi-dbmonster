@@ -29,22 +29,22 @@ goog.scope(function() {
       var row = VNode.createElement('tr');
       var topFiveQueries = db['lastSample']['topFiveQueries'];
 
-      var children = [
-        VNode.createElement(app.ui.main._DBNameTag).children(db['dbname']),
-        VNode.createElement(app.ui.main._QueryCountTag).children([
-          VNode.createElement('span').classes(db['lastSample']['countClassName']).children(''+db['lastSample']['nbQueries'])
-        ])
-      ];
+      var children = new Array(7);
+
+      children[0] = VNode.createElement(app.ui.main._DBNameTag).children(db['dbname']);
+      children[1] = VNode.createElement(app.ui.main._QueryCountTag).children([
+        VNode.createElement('span').classes(db['lastSample']['countClassName']).children(''+db['lastSample']['nbQueries'])
+      ]);
       for (var j = 0; j < 5; j++) {
         var q = topFiveQueries[j];
 
-        children.push(VNode.createElement('td').classes(q['elapsedClassName']).children([
+        children[j+2] = VNode.createElement('td').classes(q['elapsedClassName']).children([
           VNode.createText(q['formatElapsed']),
           VNode.createElement(app.ui.main._PopoverTag).children([
               VNode.createElement(app.ui.main._ContentTag).children(q['query']),
               VNode.createElement(app.ui.main._ArrowTag)
           ])
-        ]));
+        ]);
       }
 
       rows[i] = row.children(children);
