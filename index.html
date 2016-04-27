@@ -3,13 +3,52 @@
 <head>
 	<meta charset="utf-8">
   <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-  <link href="styles.css" rel="stylesheet">
-  <title>dbmon</title>
+  <style>
+#perf {
+  position: fixed;
+  opacity: 0.9;
+  right: 0;
+  bottom: 0;
+}
+
+table {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff;
+}
+
+#link {
+  position: fixed;
+  top: 0; right: 0;
+  font-size: 12px;
+  padding: 5px 10px;
+  background: rgba(255,255,255,0.85);
+  z-index: 5;
+  box-shadow: 0 0 8px rgba(0,0,0,0.6);
+}
+
+#link .center {
+  display: block;
+  text-align: center;
+}
+
+.Query {
+  position: relative;
+}
+
+.Query:hover .popover {
+  left: -100%;
+  width: 100%;
+  display: block;
+}
+  </style>
+  <title>kivi dbmonster</title>
 </head>
 <body>
   <div id="app"></div>
-  <script src="memory-stats.js"></script>
-  <script src="monitor.js"></script>
-  <script src="new.js"></script>
+  <div id="perf"></div>
+  <script src="bundle.js"></script>
 </body>
 </html>
