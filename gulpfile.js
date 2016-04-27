@@ -1,107 +1,74 @@
 'use strict';
 
 var gulp = require('gulp');
-var gulp_if = require('gulp-if');
 var del = require('del');
-var browserSync = require('browser-sync');
+var ts = require('gulp-typescript');
+var rollup = require('rollup');
 var closureCompiler = require('google-closure-compiler').gulp();
 var ghPages = require('gulp-gh-pages');
 
-var DEST = './build';
 var CLOSURE_OPTS = {
-  define: [
-    'kivi.DEBUG=false'
-  ],
-  dependency_mode: 'STRICT',
-  entry_point: 'goog:app',
-  compilation_level: 'ADVANCED_OPTIMIZATIONS',
+  compilation_level: 'ADVANCED',
   language_in: 'ECMASCRIPT6_STRICT',
   language_out: 'ECMASCRIPT5_STRICT',
+  use_types_for_optimization: true,
+  assume_function_wrapper: true,
   output_wrapper: '(function(){%output%}).call();',
-  warning_level: 'VERBOSE',
-  jscomp_warning: ['*', 'reportUnknownTypes'],
-  summary_detail_level: 3
+  summary_detail_level: 3,
+  warning_level: 'QUIET',
 };
 
-gulp.task('clean', del.bind(null, [DEST]));
+gulp.task('clean', del.bind(null, ['build', 'dist']));
 
-gulp.task('js:original', function() {
-  var opts = Object.create(CLOSURE_OPTS);
-  opts['js_output_file'] = 'original.js';
-
-  return gulp.src(['web/original.js', 'web/js/**/*.js', 'node_modules/kivi/src/**/*.js'])
-      .pipe(closureCompiler(opts))
-      .pipe(gulp.dest(DEST))
-      .pipe(browserSync.reload({stream: true}));
+gulp.task('ts', function() {
+  return gulp.src('src/**/*.ts')
+    .pipe(ts(require('./tsconfig.json').compilerOptions))
+    .pipe(gulp.dest('build/es6'));
 });
 
-gulp.task('js:new', function() {
-  var opts = Object.create(CLOSURE_OPTS);
-  opts['js_output_file'] = 'new.js';
-
-  return gulp.src(['web/new.js', 'web/js/**/*.js', 'node_modules/kivi/src/**/*.js'])
-    .pipe(closureCompiler(opts))
-    .pipe(gulp.dest(DEST))
-    .pipe(browserSync.reload({stream: true}));
-});
-
-gulp.task('js:a', function() {
-  var opts = Object.create(CLOSURE_OPTS);
-  opts['js_output_file'] = 'a.js';
-
-  return gulp.src(['web/a.js', 'web/profiler.js', 'web/js/**/*.js', 'node_modules/kivi/src/**/*.js'])
-      .pipe(closureCompiler(opts))
-      .pipe(gulp.dest(DEST))
-      .pipe(browserSync.reload({stream: true}));
-});
-
-gulp.task('js:tablebench', function() {
-  var opts = Object.create(CLOSURE_OPTS);
-  opts['js_output_file'] = 'tablebench.js';
-
-  return gulp.src(['web/tablebench.js', 'web/profiler.js', 'node_modules/kivi/src/**/*.js'])
-      .pipe(closureCompiler(opts))
-      .pipe(gulp.dest(DEST))
-      .pipe(browserSync.reload({stream: true}));
-});
-
-gulp.task('js', ['js:original', 'js:new', 'js:tablebench', 'js:a']);
-
-gulp.task('monitor-js', function() {
-  gulp.src(['./web/memory-stats.js', './web/monitor.js', './web/ENV.js'])
-    .pipe(gulp.dest(DEST))
-    .pipe(browserSync.reload({stream: true}));
-});
-
-gulp.task('html', function() {
-  gulp.src('./web/*.html')
-    .pipe(gulp.dest(DEST))
-    .pipe(browserSync.reload({stream: true}));
-});
-
-gulp.task('styles', function() {
-  gulp.src('./web/*.css')
-    .pipe(gulp.dest(DEST))
-    .pipe(browserSync.reload({stream: true}));
-});
-
-gulp.task('serve', ['default'], function() {
-  browserSync({
-    open: false,
-    port: 3000,
-    notify: false,
-    server: 'build'
+gulp.task('js:bundle', ['ts'], function(done) {
+  return rollup.rollup({
+    format: 'es6',
+    entry: 'build/es6/main.js',
+    plugins: [
+      require('rollup-plugin-replace')({
+        delimiters: ['<@', '@>'],
+        values: {
+          KIVI_DEBUG: 'DEBUG_DISABLED'
+        }
+      }),
+      require('rollup-plugin-node-resolve')({
+        jsnext: true,
+      })
+    ]
+  }).then(function(bundle) {
+    return bundle.write({
+      format: 'es6',
+      dest: 'build/bundle.es6.js',
+      sourceMap: 'inline',
+    });
   });
+});
 
-  gulp.watch('./web/js/**/*.js', ['scripts']);
-  gulp.watch('./web/**/*.html', ['html']);
-  gulp.watch(['./web/memory-stats.js', './web/monitor.js'], ['monitor-js']);
-  gulp.watch('./web/*.css', ['styles']);
+gulp.task('js:optimize', ['js:bundle'], function() {
+  var opts = Object.create(CLOSURE_OPTS);
+  opts['js_output_file'] = 'bundle.js';
+
+  return gulp.src(['build/bundle.es6.js'])
+      .pipe(closureCompiler(opts))
+      .pipe(gulp.dest('dist'));
+});
+
+gulp.task('js', ['js:optimize']);
+
+gulp.task('statics', function() {
+  gulp.src(['./src/index.html'])
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('deploy', ['default'], function () {
-  return gulp.src(DEST + '/**/*')
+  return gulp.src('dist/**/*')
     .pipe(ghPages());
 });
 
-gulp.task('default', ['js', 'monitor-js', 'styles', 'html']);
+gulp.task('default', ['statics', 'js']);
