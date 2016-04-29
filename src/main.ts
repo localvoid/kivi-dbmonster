@@ -1,13 +1,16 @@
 import {injectComponent} from 'kivi';
 import {DatabaseList} from './data';
 import {Main} from './components/main';
-import {initProfiler, measure} from './profiler';
+import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from 'perf-monitor';
 
 let mutations = 0.5;
 const N = 50;
 
 document.addEventListener('DOMContentLoaded', () => {
-  initProfiler('update', document.getElementById('perf'));
+  startFPSMonitor();
+  startMemMonitor();
+  initProfiler('data update');
+  initProfiler('view update');
 
   const dbs = new DatabaseList(N);
 
@@ -31,11 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const c = injectComponent(Main, dbs, document.getElementById('app'));
 
   function update() {
+    startProfile('data update');
     dbs.randomUpdate(mutations);
-    measure('update', function() {
-      Main._update(c);
-    });
-    setTimeout(update, 0);
+    endProfile('data update');
+
+    startProfile('view update')
+    Main._update(c);
+    endProfile('view update');
+
+    requestAnimationFrame(update);
   }
-  setTimeout(update, 0);
+  requestAnimationFrame(update);
 });

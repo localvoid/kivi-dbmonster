@@ -1,4 +1,4 @@
-import {ComponentDescriptor, VModel, createRoot, createElement, createText} from 'kivi';
+import {ComponentDescriptor, VModel, VNode, createVRoot, createVElement, createVText} from 'kivi';
 import {DB} from '../data';
 import {Popover} from './popover';
 
@@ -44,22 +44,21 @@ export const DatabaseView = new ComponentDescriptor<DB, any>()
     let topFiveQueries = db.getTopFiveQueries();
     let count = db.queries.length;
 
-    let children = [
-      DBNameTag.createVNode().children(db.name),
-      QueryCountTag.createVNode().children([
-        createElement('span').className(counterClasses(count)).children('' + count)
-      ])
-    ]
+    let children: VNode[] = new Array(7);
+    children[0] = DBNameTag.createVNode().children(db.name);
+    children[1] = QueryCountTag.createVNode().children([
+      createVElement('span').className(counterClasses(count)).children('' + count)
+    ]);
 
     for (let i = 0; i < 5; i++) {
       let q = topFiveQueries[i];
       let elapsed = q.elapsed;
 
-      children.push(createElement('td').className(queryClasses(elapsed)).children([
-        createText(entryFormatElapsed(elapsed)),
+      children[i+2] = createVElement('td').className(queryClasses(elapsed)).children([
+        createVText(entryFormatElapsed(elapsed)),
         Popover.createVNode(q.query)
-      ]))
+      ]);
     }
 
-    c.sync(createRoot().children(children));
+    c.sync(createVRoot().children(children));
   });

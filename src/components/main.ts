@@ -1,4 +1,4 @@
-import {ComponentDescriptor, VModel, createElement} from 'kivi';
+import {ComponentDescriptor, VModel, createVElement} from 'kivi';
 import {DatabaseList} from '../data';
 import {DatabaseView} from './db';
 
@@ -14,6 +14,6 @@ export const Main = new ComponentDescriptor<DatabaseList, any>()
     }
 
     c.sync(MainRootTag.createVRoot().children([
-      createElement('tbody').children(rows)
+      createVElement('tbody').children(rows)
     ]))
   });
