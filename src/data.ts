@@ -10,8 +10,8 @@ export class Query {
     this.query = query;
   }
 
-  static rand() : Query {
-    let elapsed = Math.random() * 15;
+  static rand(): Query {
+    const elapsed = Math.random() * 15;
     let query: string;
 
     if (Math.random() < 0.1) {
@@ -46,10 +46,10 @@ export class DB {
 
   static _nextId = 0;
 
-  update() : void {
-    let queries = [] as Query[];
+  update(): void {
+    const queries = [] as Query[];
 
-    let r = Math.floor((Math.random() * 10) + 1);
+    const r = Math.floor((Math.random() * 10) + 1);
     for (let j = 0; j < r; j++) {
       queries.push(Query.rand());
     }
@@ -57,7 +57,7 @@ export class DB {
     this.queries = queries;
   }
 
-  getTopFiveQueries() : Query[] {
+  getTopFiveQueries(): Query[] {
     let qs = this.queries.slice();
     qs.sort(function(a, b) {
       return a.elapsed - b.elapsed;
@@ -73,7 +73,7 @@ export class DB {
 /**
  * @final
  */
-export class DatabaseList {
+export class DBList {
   dbs: DB[];
 
   constructor(n: number) {
@@ -85,15 +85,15 @@ export class DatabaseList {
     }
   }
 
-  update() : void {
-    let dbs = this.dbs;
+  update(): void {
+    const dbs = this.dbs;
     for (let i = 0; i < dbs.length; i++) {
       dbs[i] = new DB(dbs[i].name);
     }
   }
 
-  randomUpdate(r: number) : void {
-    let dbs = this.dbs;
+  randomUpdate(r: number): void {
+    const dbs = this.dbs;
     for (let i = 0; i < dbs.length; i++) {
       if (Math.random() < r) {
         dbs[i] = new DB(dbs[i].name);

@@ -3,6 +3,7 @@
 var gulp = require('gulp');
 var del = require('del');
 var ts = require('gulp-typescript');
+var tslint = require("gulp-tslint");
 var rollup = require('rollup');
 var closureCompiler = require('google-closure-compiler').gulp();
 var ghPages = require('gulp-gh-pages');
@@ -22,6 +23,8 @@ gulp.task('clean', del.bind(null, ['build', 'dist']));
 
 gulp.task('ts', function() {
   return gulp.src('src/**/*.ts')
+    .pipe(tslint())
+    .pipe(tslint.report('verbose'))
     .pipe(ts(require('./tsconfig.json').compilerOptions))
     .pipe(gulp.dest('build/es6'));
 });

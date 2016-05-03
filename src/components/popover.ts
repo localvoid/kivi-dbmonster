@@ -1,14 +1,17 @@
-import {ComponentDescriptor, VModel} from 'kivi';
+import {ComponentDescriptor, VModel, VNode} from 'kivi';
 
-const PopoverRootTag = new VModel('div').className('popover left');
-const ContentTag = new VModel('div').className('popover-content');
-const ArrowTag = new VModel('div').className('arrow');
+const PopoverRootElement = new VModel('div').className('popover left');
+const ContentElement = new VModel('div').className('popover-content');
+const ArrowElement = new VModel('div').className('arrow');
 
-export const Popover = new ComponentDescriptor<string, any>()
-  .rootVModel(PopoverRootTag)
+export const Popover = new ComponentDescriptor<string, VNode>()
+  .vModel(PopoverRootElement)
   .update((c) => {
-    c.sync(PopoverRootTag.createVRoot().children([
-      ContentTag.createVNode().children(c.data),
-      ArrowTag.createVNode()
-    ]))
+    if (c.state === null) {
+      c.state = ArrowElement.createVNode();
+    }
+    c.sync(PopoverRootElement.createVRoot().children([
+      ContentElement.createVNode().children(c.data),
+      c.state,
+    ]));
   });

@@ -1,5 +1,5 @@
 import {injectComponent} from 'kivi';
-import {DatabaseList} from './data';
+import {DBList} from './data';
 import {Main} from './components/main';
 import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from 'perf-monitor';
 
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initProfiler('data update');
   initProfiler('view update');
 
-  const dbs = new DatabaseList(N);
+  const dbs = new DBList(N);
 
   const sliderContainer = document.createElement('div');
   sliderContainer.style.display = 'flex';
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dbs.randomUpdate(mutations);
     endProfile('data update');
 
-    startProfile('view update')
+    startProfile('view update');
     Main._update(c);
     endProfile('view update');
 
