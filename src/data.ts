@@ -15,18 +15,18 @@ export class Query {
     let query: string;
 
     if (Math.random() < 0.1) {
-      query = 'vacuum';
+      query = "vacuum";
     } else if (Math.random() < 0.2) {
-      query = '<IDLE> in transaction';
+      query = "<IDLE> in transaction";
     } else {
-      query = 'SELECT blah FROM something';
+      query = "SELECT blah FROM something";
     }
 
     return new Query(elapsed, query);
   }
 };
 
-const EMPTY_QUERY = new Query(0.0, '');
+export const EMPTY_QUERY = new Query(0.0, "");
 
 /**
  * @final
@@ -80,8 +80,8 @@ export class DBList {
     this.dbs = [];
 
     for (let i = 0; i < n; i++) {
-      this.dbs.push(new DB('cluster' + i));
-      this.dbs.push(new DB('cluster' + i + 'slave'));
+      this.dbs.push(new DB("cluster" + i));
+      this.dbs.push(new DB("cluster" + i + " slave"));
     }
   }
 
