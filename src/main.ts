@@ -63,10 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function update() {
     startProfile("data update");
     dbs.randomUpdate(mutations);
+    c.invalidate();
     endProfile("data update");
 
     startProfile("view update");
-    c.markDirty();
     c.update();
     scheduler.currentFrame().after(() => {
       endProfile("view update");

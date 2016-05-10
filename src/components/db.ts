@@ -39,18 +39,18 @@ function queryClasses(elapsed: number): string {
 const DBNameElement = new VModel("td").className("dbname");
 const QueryCountElement = new VModel("td").className("query-count");
 
-export const DatabaseView = new ComponentDescriptor<DB, VNode>()
+export const DatabaseView = new ComponentDescriptor<DB, any, VNode>()
   .tagName("tr")
   .vRender((c, root) => {
-    const db = c.data;
+    const db = c.props;
     const topFiveQueries = db.getTopFiveQueries();
     const count = db.queries.length;
 
     const children: VNode[] = new Array(7);
-    if (c.state === undefined) {
-      c.state = DBNameElement.createVNode().children(db.name);
+    if (c.data === null) {
+      c.data = DBNameElement.createVNode().children(db.name);
     }
-    children[0] = c.state;
+    children[0] = c.data;
     children[1] = QueryCountElement.createVNode().children([
       createVElement("span").className(counterClasses(count)).children("" + count),
     ]);
