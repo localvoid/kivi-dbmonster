@@ -10,6 +10,8 @@ var ghPages = require('gulp-gh-pages');
 
 var CLOSURE_OPTS = {
   compilation_level: 'ADVANCED',
+  entry_point: 'goog:main',
+  dependency_mode: 'STRICT',
   language_in: 'ECMASCRIPT6_STRICT',
   language_out: 'ECMASCRIPT5_STRICT',
   use_types_for_optimization: true,
@@ -25,7 +27,9 @@ gulp.task('ts', function() {
   return gulp.src('src/**/*.ts')
     .pipe(tslint())
     .pipe(tslint.report('verbose'))
-    .pipe(ts(require('./tsconfig.json').compilerOptions))
+    .pipe(ts(Object.assign(require('./tsconfig.json').compilerOptions, {
+      typescript: require('typescript'),
+    })))
     .pipe(gulp.dest('build/es6'));
 });
 
@@ -48,6 +52,32 @@ gulp.task('js:bundle', ['ts'], function(done) {
     return bundle.write({
       format: 'es6',
       dest: 'build/bundle.es6.js',
+      intro: 'goog.module("main");',
+      sourceMap: 'inline',
+    });
+  });
+});
+
+gulp.task('js:bundle_incremental', ['ts'], function(done) {
+  return rollup.rollup({
+    format: 'es6',
+    entry: 'build/es6/incremental.js',
+    plugins: [
+      require('rollup-plugin-replace')({
+        delimiters: ['<@', '@>'],
+        values: {
+          KIVI_DEBUG: 'DEBUG_DISABLED'
+        }
+      }),
+      require('rollup-plugin-node-resolve')({
+        jsnext: true,
+      })
+    ]
+  }).then(function(bundle) {
+    return bundle.write({
+      format: 'es6',
+      dest: 'build/bundle_incremental.es6.js',
+      intro: 'goog.module("main");',
       sourceMap: 'inline',
     });
   });
@@ -62,10 +92,19 @@ gulp.task('js:optimize', ['js:bundle'], function() {
       .pipe(gulp.dest('dist'));
 });
 
-gulp.task('js', ['js:optimize']);
+gulp.task('js:optimize_incremental', ['js:bundle_incremental'], function() {
+  var opts = Object.create(CLOSURE_OPTS);
+  opts['js_output_file'] = 'bundle_incremental.js';
+
+  return gulp.src(['build/bundle_incremental.es6.js'])
+      .pipe(closureCompiler(opts))
+      .pipe(gulp.dest('dist'));
+});
+
+gulp.task('js', ['js:optimize', 'js:optimize_incremental']);
 
 gulp.task('statics', function() {
-  gulp.src(['./src/index.html'])
+  gulp.src(['./src/*.html'])
     .pipe(gulp.dest('dist'));
 });
 

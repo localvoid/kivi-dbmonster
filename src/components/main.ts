@@ -2,16 +2,16 @@ import {ComponentDescriptor, VModel, createVElement} from "kivi";
 import {DBList} from "../data";
 import {DatabaseView} from "./db";
 
-export const Main = new ComponentDescriptor<DBList, any, any>()
+export const Main = new ComponentDescriptor<DBList, void>()
   .vModel(new VModel("table").className("table table-striped latest-data"))
-  .vRender((c, root) => {
-    const dbs = c.props.dbs;
+  .update((c, props) => {
+    const dbs = props.dbs;
     const rows = new Array(dbs.length);
     for (let i = 0; i < dbs.length; i++) {
-      rows[i] = DatabaseView.createVNode(dbs[i]);
+      rows[i] = DatabaseView.createImmutableVNode(dbs[i]);
     }
 
-    root.children([
+    c.vSync(c.createVRoot().children([
       createVElement("tbody").children(rows),
-    ]);
+    ]));
   });

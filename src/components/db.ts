@@ -39,18 +39,15 @@ function queryClasses(elapsed: number): string {
 const DBNameElement = new VModel("td").className("dbname");
 const QueryCountElement = new VModel("td").className("query-count");
 
-export const DatabaseView = new ComponentDescriptor<DB, any, VNode>()
+export const DatabaseView = new ComponentDescriptor<DB, { nameNode: VNode }>()
   .tagName("tr")
-  .vRender((c, root) => {
-    const db = c.props;
+  .createState((c, props) => ({ nameNode: DBNameElement.createVNode().children(props.name) }))
+  .update((c, db, state) => {
     const topFiveQueries = db.getTopFiveQueries();
     const count = db.queries.length;
 
     const children: VNode[] = new Array(7);
-    if (c.data === null) {
-      c.data = DBNameElement.createVNode().children(db.name);
-    }
-    children[0] = c.data;
+    children[0] = state.nameNode;
     children[1] = QueryCountElement.createVNode().children([
       createVElement("span").className(counterClasses(count)).children("" + count),
     ]);
@@ -62,15 +59,15 @@ export const DatabaseView = new ComponentDescriptor<DB, any, VNode>()
       if (q !== EMPTY_QUERY) {
         children[i + 2] = createVElement("td").className(queryClasses(elapsed)).children([
           createVText(entryFormatElapsed(elapsed)),
-          Popover.createVNode(q.query),
+          Popover.createImmutableVNode(q.query),
         ]);
       } else {
         children[i + 2] = createVElement("td").className("").children([
           createVText(""),
-          Popover.createVNode(""),
+          Popover.createImmutableVNode(""),
         ]);
       }
     }
 
-    root.children(children);
+    c.vSync(c.createVRoot().children(children));
   });

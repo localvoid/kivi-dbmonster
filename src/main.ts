@@ -32,11 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initProfiler("view update");
 
   if (qs["incremental"] !== undefined) {
-    let time = parseFloat(qs["incremental"]);
-    if (time <= 0) {
-      time = 10;
-    }
-    scheduler.enableThrottling(time);
+    scheduler.enableThrottling();
   }
 
   const dbs = new DBList(N);
@@ -63,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function update() {
     startProfile("data update");
     dbs.randomUpdate(mutations);
-    c.invalidate();
+    c.markDirty();
     endProfile("data update");
 
     startProfile("view update");
