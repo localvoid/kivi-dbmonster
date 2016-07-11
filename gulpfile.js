@@ -83,6 +83,31 @@ gulp.task('js:bundle_incremental', ['ts'], function(done) {
   });
 });
 
+gulp.task('js:bundle_10k', ['ts'], function(done) {
+  return rollup.rollup({
+    format: 'es6',
+    entry: 'build/es6/10k.js',
+    plugins: [
+      require('rollup-plugin-replace')({
+        delimiters: ['<@', '@>'],
+        values: {
+          KIVI_DEBUG: 'DEBUG_DISABLED'
+        }
+      }),
+      require('rollup-plugin-node-resolve')({
+        jsnext: true,
+      })
+    ]
+  }).then(function(bundle) {
+    return bundle.write({
+      format: 'es6',
+      dest: 'build/bundle_10k.es6.js',
+      intro: 'goog.module("main");',
+      sourceMap: 'inline',
+    });
+  });
+});
+
 gulp.task('js:optimize', ['js:bundle'], function() {
   var opts = Object.create(CLOSURE_OPTS);
   opts['js_output_file'] = 'bundle.js';
@@ -101,7 +126,16 @@ gulp.task('js:optimize_incremental', ['js:bundle_incremental'], function() {
       .pipe(gulp.dest('dist'));
 });
 
-gulp.task('js', ['js:optimize', 'js:optimize_incremental']);
+gulp.task('js:optimize_10k', ['js:bundle_10k'], function() {
+  var opts = Object.create(CLOSURE_OPTS);
+  opts['js_output_file'] = 'bundle_10k.js';
+
+  return gulp.src(['build/bundle_10k.es6.js'])
+      .pipe(closureCompiler(opts))
+      .pipe(gulp.dest('dist'));
+});
+
+gulp.task('js', ['js:optimize', 'js:optimize_incremental', 'js:optimize_10k']);
 
 gulp.task('statics', function() {
   gulp.src(['./src/*.html'])

@@ -1,4 +1,4 @@
-import {scheduler, injectComponent} from "kivi";
+import {currentFrame, nextFrame, injectComponent, enableThrottling} from "kivi";
 import {DBList} from "./data";
 import {Main} from "./components/main";
 import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from "perf-monitor";
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initProfiler("view update");
 
   if (qs["incremental"] !== undefined) {
-    scheduler.enableThrottling();
+    enableThrottling();
   }
 
   const dbs = new DBList(N);
@@ -64,15 +64,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     startProfile("view update");
     c.update();
-    scheduler.currentFrame().after(() => {
+    currentFrame().after(() => {
       endProfile("view update");
     });
 
     // setTimeout(update, 1000);
-    scheduler.nextFrame().write(update);
+    nextFrame().write(update);
     // requestAnimationFrame(update);
   }
   // setTimeout(update, 1000);
-  scheduler.nextFrame().write(update);
+  nextFrame().write(update);
   // requestAnimationFrame(update);
 });

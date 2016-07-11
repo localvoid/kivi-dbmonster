@@ -1,4 +1,4 @@
-import {scheduler, injectComponent} from "kivi";
+import {nextFrame, injectComponent} from "kivi";
 import {ComponentDescriptor, VModel} from "kivi";
 import {DBList} from "./data";
 import {Main} from "./components/main";
@@ -35,6 +35,15 @@ const DragMe = new ComponentDescriptor<void, DragMeState>()
         c.startInteraction();
       }
     };
+    (c.element as HTMLElement).ontouchstart = (e) => {
+      if (!c.state.drag) {
+        e.preventDefault();
+        c.state.drag = true;
+        c.state.startLeft = e.touches[0].pageX - (e.currentTarget as HTMLElement).offsetLeft;
+        c.state.startTop = e.touches[0].pageY - (e.currentTarget as HTMLElement).offsetTop;
+        c.startInteraction();
+      }
+    };
     window.onmousemove = (e) => {
       if (c.state.drag) {
         c.state.left = e.pageX - c.state.startLeft;
@@ -42,8 +51,23 @@ const DragMe = new ComponentDescriptor<void, DragMeState>()
         c.invalidate();
       }
     };
+    window.ontouchmove = (e) => {
+      if (c.state.drag) {
+        e.preventDefault();
+        c.state.left = e.touches[0].pageX - c.state.startLeft;
+        c.state.top = e.touches[0].pageY - c.state.startTop;
+        c.invalidate();
+      }
+    };
     window.onmouseup = () => {
       if (c.state.drag) {
+        c.state.drag = false;
+        c.finishInteraction();
+      }
+    };
+    window.ontouchend = (e) => {
+      if (c.state.drag) {
+        e.preventDefault();
         c.state.drag = false;
         c.finishInteraction();
       }
@@ -65,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     dbs.randomUpdate(mutations);
     c.markDirty();
     c.update();
-    scheduler.nextFrame().write(update);
+    nextFrame().write(update);
   }
-  scheduler.nextFrame().write(update);
+  nextFrame().write(update);
 });
