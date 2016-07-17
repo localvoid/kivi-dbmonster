@@ -1,4 +1,4 @@
-import {currentFrame, nextFrame, injectComponent, enableThrottling} from "kivi";
+import {nextFrame, injectComponent} from "kivi";
 import {DBList} from "./data";
 import {Main} from "./components/main";
 import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from "perf-monitor";
@@ -6,34 +6,11 @@ import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile
 let mutations = 0.5;
 const N = 50;
 
-function parseQueryString(a: string[]): {[key: string]: string} {
-  if (a.length === 0) {
-    return {};
-  }
-
-  const b = {} as {[key: string]: string};
-  for (let i = 0; i < a.length; ++i) {
-    const p = a[i].split("=", 2);
-    if (p.length === 1) {
-      b[p[0]] = "";
-    } else {
-      b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
-    }
-  }
-  return b;
-}
-
-const qs = parseQueryString(window.location.search.substr(1).split("&"));
-
 document.addEventListener("DOMContentLoaded", () => {
   startFPSMonitor();
   startMemMonitor();
   initProfiler("data update");
   initProfiler("view update");
-
-  if (qs["incremental"] !== undefined) {
-    enableThrottling();
-  }
 
   const dbs = new DBList(N);
 
@@ -64,15 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     startProfile("view update");
     c.update();
-    currentFrame().after(() => {
-      endProfile("view update");
-    });
+    endProfile("view update");
 
-    // setTimeout(update, 1000);
     nextFrame().write(update);
-    // requestAnimationFrame(update);
   }
-  // setTimeout(update, 1000);
   nextFrame().write(update);
-  // requestAnimationFrame(update);
 });
