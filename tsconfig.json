@@ -1,16 +1,24 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "lib": ["es6", "dom"],
     "outDir": "build/es6",
     "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "strictNullChecks": true,
     "removeComments": false,
     "moduleResolution": "node"
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "typings/main",
-    "typings/main.d.ts"
+  "files": [
+    "src/10k.ts",
+    "src/data.ts",
+    "src/incremental.ts",
+    "src/main.ts",
+    "src/components/db.ts",
+    "src/components/main.ts",
+    "src/components/popover.ts"
   ],
   "compileOnSave": false
 }

@@ -1,14 +1,13 @@
-'use strict';
+const gulp = require('gulp');
+const typescript = require('typescript');
+const ts = require('gulp-typescript');
+const tslint = require("gulp-tslint");
+const rollup = require('rollup');
+const rollupReplace = require('rollup-plugin-replace');
+const rollupNodeResolve = require('rollup-plugin-node-resolve');
+const closureCompiler = require('google-closure-compiler').gulp();
 
-var gulp = require('gulp');
-var del = require('del');
-var ts = require('gulp-typescript');
-var tslint = require("gulp-tslint");
-var rollup = require('rollup');
-var closureCompiler = require('google-closure-compiler').gulp();
-var ghPages = require('gulp-gh-pages');
-
-var CLOSURE_OPTS = {
+const ClosureConfig = {
   compilation_level: 'ADVANCED',
   entry_point: 'goog:main',
   dependency_mode: 'STRICT',
@@ -21,69 +20,69 @@ var CLOSURE_OPTS = {
   warning_level: 'QUIET',
 };
 
-gulp.task('clean', del.bind(null, ['build', 'dist']));
+function clean() {
+  const del = require('del');
+  return del(['build', 'dist']);
+}
 
-gulp.task('ts', function() {
+function compileTS() {
   return gulp.src('src/**/*.ts')
-    .pipe(tslint())
-    .pipe(tslint.report('verbose'))
+    .pipe(tslint({
+      formatter: "verbose",
+    }))
     .pipe(ts(Object.assign(require('./tsconfig.json').compilerOptions, {
       typescript: require('typescript'),
     })))
     .pipe(gulp.dest('build/es6'));
-});
+}
 
-gulp.task('js:bundle', ['ts'], function(done) {
+function bundleMain(done) {
   return rollup.rollup({
     format: 'es6',
     entry: 'build/es6/main.js',
     plugins: [
-      require('rollup-plugin-replace')({
+      rollupReplace({
         delimiters: ['<@', '@>'],
         values: {
-          KIVI_DEBUG: 'DEBUG_DISABLED'
-        }
+          KIVI_DEBUG: 'DEBUG_DISABLED',
+        },
       }),
-      require('rollup-plugin-node-resolve')({
-        jsnext: true,
-      })
+      rollupNodeResolve({jsnext: true}),
     ]
   }).then(function(bundle) {
     return bundle.write({
-      format: 'es6',
+      format: 'es',
       dest: 'build/bundle.es6.js',
       intro: 'goog.module("main");',
       sourceMap: 'inline',
     });
   });
-});
+}
 
-gulp.task('js:bundle_incremental', ['ts'], function(done) {
+function bundleIncremental(done) {
   return rollup.rollup({
     format: 'es6',
     entry: 'build/es6/incremental.js',
     plugins: [
-      require('rollup-plugin-replace')({
+      rollupReplace({
         delimiters: ['<@', '@>'],
         values: {
-          KIVI_DEBUG: 'DEBUG_DISABLED'
-        }
+          KIVI_DEBUG: 'DEBUG_DISABLED',
+        },
       }),
-      require('rollup-plugin-node-resolve')({
-        jsnext: true,
-      })
+      rollupNodeResolve({jsnext: true}),
     ]
   }).then(function(bundle) {
     return bundle.write({
-      format: 'es6',
+      format: 'es',
       dest: 'build/bundle_incremental.es6.js',
       intro: 'goog.module("main");',
       sourceMap: 'inline',
     });
   });
-});
+}
 
-gulp.task('js:bundle_10k', ['ts'], function(done) {
+function bundle10k(done) {
   return rollup.rollup({
     format: 'es6',
     entry: 'build/es6/10k.js',
@@ -91,60 +90,67 @@ gulp.task('js:bundle_10k', ['ts'], function(done) {
       require('rollup-plugin-replace')({
         delimiters: ['<@', '@>'],
         values: {
-          KIVI_DEBUG: 'DEBUG_DISABLED'
-        }
+          KIVI_DEBUG: 'DEBUG_DISABLED',
+        },
       }),
-      require('rollup-plugin-node-resolve')({
-        jsnext: true,
-      })
+      require('rollup-plugin-node-resolve')({jsnext: true}),
     ]
   }).then(function(bundle) {
     return bundle.write({
-      format: 'es6',
+      format: 'es',
       dest: 'build/bundle_10k.es6.js',
       intro: 'goog.module("main");',
       sourceMap: 'inline',
     });
   });
-});
+}
 
-gulp.task('js:optimize', ['js:bundle'], function() {
-  var opts = Object.create(CLOSURE_OPTS);
-  opts['js_output_file'] = 'bundle.js';
-
+function compileMain() {
   return gulp.src(['build/bundle.es6.js'])
-      .pipe(closureCompiler(opts))
+      .pipe(closureCompiler(Object.assign({}, ClosureConfig, {
+        js_output_file: 'bundle.js',
+      })))
       .pipe(gulp.dest('dist'));
-});
+}
 
-gulp.task('js:optimize_incremental', ['js:bundle_incremental'], function() {
-  var opts = Object.create(CLOSURE_OPTS);
-  opts['js_output_file'] = 'bundle_incremental.js';
-
+function compileIncremental() {
   return gulp.src(['build/bundle_incremental.es6.js'])
-      .pipe(closureCompiler(opts))
+      .pipe(closureCompiler(Object.assign({}, ClosureConfig, {
+        js_output_file: 'bundle_incremental.js',
+      })))
       .pipe(gulp.dest('dist'));
-});
+}
 
-gulp.task('js:optimize_10k', ['js:bundle_10k'], function() {
-  var opts = Object.create(CLOSURE_OPTS);
-  opts['js_output_file'] = 'bundle_10k.js';
-
+function compile10k() {
   return gulp.src(['build/bundle_10k.es6.js'])
-      .pipe(closureCompiler(opts))
+      .pipe(closureCompiler(Object.assign({}, ClosureConfig, {
+        js_output_file: 'bundle_10k.js',
+      })))
       .pipe(gulp.dest('dist'));
-});
+}
 
-gulp.task('js', ['js:optimize', 'js:optimize_incremental', 'js:optimize_10k']);
-
-gulp.task('statics', function() {
-  gulp.src(['./src/*.html'])
+function html() {
+  return gulp.src(['./src/*.html'])
     .pipe(gulp.dest('dist'));
-});
+}
 
-gulp.task('deploy', ['default'], function () {
+function deploy() {
+  const ghPages = require('gulp-gh-pages');
+
   return gulp.src('dist/**/*')
     .pipe(ghPages());
-});
+}
 
-gulp.task('default', ['statics', 'js']);
+const build = gulp.series(
+  clean,
+  html,
+  compileTS,
+  bundleMain,
+  bundleIncremental,
+  bundle10k,
+  compileMain,
+  compileIncremental,
+  compile10k);
+
+exports.build = build;
+exports.deploy = deploy;

@@ -22,19 +22,19 @@
     "dbmonster"
   ],
   "dependencies": {
-    "kivi": "^0.9.0",
-    "perf-monitor": "^0.1.0"
+    "kivi": "^0.10.0",
+    "perf-monitor": "^0.2.0"
   },
   "devDependencies": {
-    "del": "^2.2.0",
-    "google-closure-compiler": "^20160619.0.0",
-    "gulp": "^3.9.1",
+    "del": "^2.2.1",
+    "google-closure-compiler": "^20160713.0.0",
+    "gulp": "github:gulpjs/gulp#4.0",
     "gulp-gh-pages": "^0.5.4",
-    "gulp-tslint": "^5.0.0",
-    "gulp-typescript": "^2.13.0",
-    "rollup": "^0.33.0",
-    "rollup-plugin-node-resolve": "^1.5.0",
-    "rollup-plugin-replace": "^1.1.0",
-    "typescript": "^2.0.0-dev.20160629"
+    "gulp-tslint": "^6.0.1",
+    "gulp-typescript": "^2.13.6",
+    "rollup": "^0.34.1",
+    "rollup-plugin-node-resolve": "^1.7.1",
+    "rollup-plugin-replace": "^1.1.1",
+    "typescript": "^2.0.0"
   }
 }
