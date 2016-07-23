@@ -34,7 +34,7 @@ export const EMPTY_QUERY = new Query(0.0, "");
 export class DB {
   id: number;
   name: string;
-  queries: Query[];
+  queries: Query[] | null;
 
   constructor(name: string) {
     this.id = DB._nextId++;
@@ -58,7 +58,7 @@ export class DB {
   }
 
   getTopFiveQueries(): Query[] {
-    let qs = this.queries.slice();
+    let qs = this.queries!.slice();
     qs.sort(function(a, b) {
       return a.elapsed - b.elapsed;
     });

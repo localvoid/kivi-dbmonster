@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   sliderContainer.appendChild(slider);
   document.body.insertBefore(sliderContainer, document.body.firstChild);
 
-  const c = injectComponent(Main, document.getElementById("app"), dbs);
+  const c = injectComponent(Main, document.getElementById("app")!, dbs);
 
   function update() {
     startProfile("data update");

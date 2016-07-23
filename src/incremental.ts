@@ -26,49 +26,49 @@ class DragMeState {
 const DragMe = new ComponentDescriptor<void, DragMeState>()
   .vModel(new VModel("div").className("DragMe"))
   .createState((c) => new DragMeState())
-  .attached((c) => {
+  .attached((c, props, state) => {
     (c.element as HTMLElement).onmousedown = (e) => {
-      if (!c.state.drag) {
-        c.state.drag = true;
-        c.state.startLeft = e.pageX - (e.currentTarget as HTMLElement).offsetLeft;
-        c.state.startTop = e.pageY - (e.currentTarget as HTMLElement).offsetTop;
+      if (!state.drag) {
+        state.drag = true;
+        state.startLeft = e.pageX - (e.currentTarget as HTMLElement).offsetLeft;
+        state.startTop = e.pageY - (e.currentTarget as HTMLElement).offsetTop;
         c.startInteraction();
       }
     };
     (c.element as HTMLElement).ontouchstart = (e) => {
-      if (!c.state.drag) {
+      if (!state.drag) {
         e.preventDefault();
-        c.state.drag = true;
-        c.state.startLeft = e.touches[0].pageX - (e.currentTarget as HTMLElement).offsetLeft;
-        c.state.startTop = e.touches[0].pageY - (e.currentTarget as HTMLElement).offsetTop;
+        state.drag = true;
+        state.startLeft = e.touches[0].pageX - (e.currentTarget as HTMLElement).offsetLeft;
+        state.startTop = e.touches[0].pageY - (e.currentTarget as HTMLElement).offsetTop;
         c.startInteraction();
       }
     };
     window.onmousemove = (e) => {
-      if (c.state.drag) {
-        c.state.left = e.pageX - c.state.startLeft;
-        c.state.top = e.pageY - c.state.startTop;
+      if (state.drag) {
+        state.left = e.pageX - state.startLeft;
+        state.top = e.pageY - state.startTop;
         c.invalidate();
       }
     };
     window.ontouchmove = (e) => {
-      if (c.state.drag) {
+      if (state.drag) {
         e.preventDefault();
-        c.state.left = e.touches[0].pageX - c.state.startLeft;
-        c.state.top = e.touches[0].pageY - c.state.startTop;
+        state.left = e.touches[0].pageX - state.startLeft;
+        state.top = e.touches[0].pageY - state.startTop;
         c.invalidate();
       }
     };
     window.onmouseup = () => {
-      if (c.state.drag) {
-        c.state.drag = false;
+      if (state.drag) {
+        state.drag = false;
         c.finishInteraction();
       }
     };
     window.ontouchend = (e) => {
-      if (c.state.drag) {
+      if (state.drag) {
         e.preventDefault();
-        c.state.drag = false;
+        state.drag = false;
         c.finishInteraction();
       }
     };
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   startFPSMonitor();
 
   const dbs = new DBList(N);
-  const c = injectComponent(Main, document.getElementById("app"), dbs);
+  const c = injectComponent(Main, document.getElementById("app")!, dbs);
   injectComponent(DragMe, document.body);
 
   function update() {

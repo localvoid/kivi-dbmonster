@@ -153,4 +153,5 @@ const build = gulp.series(
   compile10k);
 
 exports.build = build;
+exports.build10k = gulp.series(compileTS, bundle10k, compile10k);
 exports.deploy = deploy;
