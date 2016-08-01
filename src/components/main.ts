@@ -1,9 +1,9 @@
-import {ComponentDescriptor, VModel, createVElement} from "kivi";
+import {ComponentDescriptor, ElementDescriptor, createVElement} from "kivi";
 import {DBList} from "../data";
 import {DatabaseView} from "./db";
 
 export const Main = new ComponentDescriptor<DBList, void>()
-  .vModel(new VModel("table").className("table table-striped latest-data"))
+  .tagName(new ElementDescriptor("table").className("table table-striped latest-data"))
   .update((c, props) => {
     const dbs = props.dbs;
     const rows = new Array(dbs.length);

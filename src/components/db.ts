@@ -1,4 +1,4 @@
-import {ComponentDescriptor, VModel, VNode, createVElement, createVText} from "kivi";
+import {ComponentDescriptor, ElementDescriptor, VNode, createVElement, createVText} from "kivi";
 import {DB, EMPTY_QUERY} from "../data";
 import {Popover} from "./popover";
 
@@ -36,15 +36,15 @@ function queryClasses(elapsed: number): string {
   return "Query elapsed short";
 }
 
-const DBNameElement = new VModel("td").className("dbname");
-const QueryCountElement = new VModel("td").className("query-count");
+const DBNameElement = new ElementDescriptor("td").className("dbname");
+const QueryCountElement = new ElementDescriptor("td").className("query-count");
 
 export const DatabaseView = new ComponentDescriptor<DB, { nameNode: VNode }>()
   .tagName("tr")
   .createState((c, props) => ({ nameNode: DBNameElement.createVNode().children(props.name) }))
   .update((c, db, state) => {
     const topFiveQueries = db.getTopFiveQueries();
-    const count = db.queries.length;
+    const count = db.queries!.length;
 
     const children: VNode[] = new Array(7);
     children[0] = state.nameNode;

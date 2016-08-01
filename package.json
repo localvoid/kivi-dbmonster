@@ -22,7 +22,7 @@
     "dbmonster"
   ],
   "dependencies": {
-    "kivi": "^0.10.0",
+    "kivi": "^0.11.0",
     "perf-monitor": "^0.2.0"
   },
   "devDependencies": {

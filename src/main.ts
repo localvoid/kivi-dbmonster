@@ -1,4 +1,4 @@
-import {nextFrame, injectComponent} from "kivi";
+import {injectComponent} from "kivi";
 import {DBList} from "./data";
 import {Main} from "./components/main";
 import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from "perf-monitor";
@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
     c.update();
     endProfile("view update");
 
-    nextFrame().write(update);
+    setTimeout(update, 0);
+    // nextFrame().write(update);
   }
-  nextFrame().write(update);
+  setTimeout(update, 0);
+  // nextFrame().write(update);
 });

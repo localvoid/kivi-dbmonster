@@ -58,11 +58,10 @@ export class DB {
   }
 
   getTopFiveQueries(): Query[] {
-    let qs = this.queries!.slice();
+    let qs = this.queries!.slice(0, 5);
     qs.sort(function(a, b) {
       return a.elapsed - b.elapsed;
     });
-    qs = qs.slice(0, 5);
     while (qs.length < 5) {
       qs.push(EMPTY_QUERY);
     }
@@ -80,8 +79,8 @@ export class DBList {
     this.dbs = [];
 
     for (let i = 0; i < n; i++) {
-      this.dbs.push(new DB("cluster" + i));
-      this.dbs.push(new DB("cluster" + i + " slave"));
+      this.dbs.push(new DB("cluster" + (i + 1)));
+      this.dbs.push(new DB("cluster" + (i + 1) + " slave"));
     }
   }
 

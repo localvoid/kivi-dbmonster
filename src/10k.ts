@@ -1,4 +1,4 @@
-import {VNode, VModel, ComponentDescriptor, createVElement, injectComponent} from "kivi";
+import {VNode, ElementDescriptor, ComponentDescriptor, createVElement, injectComponent} from "kivi";
 import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from "perf-monitor";
 
 function randomColor(): string {
@@ -29,14 +29,14 @@ function updateData(data: string[], mutations: number): void {
   }
 }
 
-const PixelElement = new VModel<string>("span")
+const PixelElement = new ElementDescriptor<string>("span")
   .className("pixel")
-  .updateHandler((e, oldProps, newProps) => {
+  .update((e, oldProps, newProps) => {
     (e as HTMLSpanElement).style.backgroundColor = newProps;
   });
 
 const Pixel = new ComponentDescriptor<string, void>()
-  .vModel(PixelElement)
+  .tagName(PixelElement)
   .update((c, props) => {
     c.vSync(c.createVRoot().data(props));
   });

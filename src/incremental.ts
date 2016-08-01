@@ -1,5 +1,5 @@
 import {nextFrame, injectComponent} from "kivi";
-import {ComponentDescriptor, VModel} from "kivi";
+import {ComponentDescriptor, ElementDescriptor} from "kivi";
 import {DBList} from "./data";
 import {Main} from "./components/main";
 import {startFPSMonitor} from "perf-monitor";
@@ -24,7 +24,7 @@ class DragMeState {
 }
 
 const DragMe = new ComponentDescriptor<void, DragMeState>()
-  .vModel(new VModel("div").className("DragMe"))
+  .tagName(new ElementDescriptor("div").className("DragMe"))
   .createState((c) => new DragMeState())
   .attached((c, props, state) => {
     (c.element as HTMLElement).onmousedown = (e) => {
