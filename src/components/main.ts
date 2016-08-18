@@ -11,7 +11,7 @@ export const Main = new ComponentDescriptor<DBList, void>()
       rows[i] = DatabaseView.createImmutableVNode(dbs[i]);
     }
 
-    c.vSync(c.createVRoot().children([
+    c.sync(c.createVRoot().children([
       createVElement("tbody").children(rows),
     ]));
   });

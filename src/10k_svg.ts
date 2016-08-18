@@ -1,4 +1,4 @@
-import {VNode, ElementDescriptor, ComponentDescriptor, createVElement, injectComponent} from "kivi";
+import {VNode, ElementDescriptor, ComponentDescriptor, injectComponent} from "kivi";
 import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from "perf-monitor";
 
 function randomColor(): string {
@@ -29,28 +29,30 @@ function updateData(data: string[], mutations: number): void {
   }
 }
 
-const PixelElement = new ElementDescriptor<string>("span")
+const PixelElement = new ElementDescriptor<{x: number, y: number, fill: string}>("rect")
+  .svg()
   .className("pixel")
   .update((e, oldProps, newProps) => {
-    (e as HTMLSpanElement).style.backgroundColor = newProps;
-  });
-
-const Pixel = new ComponentDescriptor<string, void>()
-  .tagName(PixelElement)
-  .update((c, props) => {
-    c.sync(c.createVRoot().data(props));
+    if (oldProps === undefined) {
+      (e as SVGRectElement).setAttribute("x", newProps.x.toString());
+      (e as SVGRectElement).setAttribute("y", newProps.y.toString());
+    }
+    if (oldProps === undefined || oldProps.fill !== newProps.fill) {
+      (e as SVGRectElement).style.fill = newProps.fill;
+    }
   });
 
 const Image = new ComponentDescriptor<string[], void>()
+  .tagName("svg")
+  .svg()
   .update((c, props) => {
-    const children = new Array<VNode>(100);
-    for (let i = 0; i < 100; i++) {
-      const offset = i * 100;
-      const rowChildren = new Array<VNode>(100);
-      children[i] = createVElement("div").className("row").children(rowChildren);
-      for (let j = 0; j < 100; j++) {
-        rowChildren[j] = Pixel.createVNode(props[offset + j]);
-      }
+    const children = new Array<VNode>(10000);
+    for (let i = 0; i < 10000; i++) {
+      children[i] = PixelElement.createVNode({
+        x: (i % 100) * 4,
+        y: ((i / 100) | 0) * 4,
+        fill: props[i],
+      });
     }
 
     c.sync(c.createVRoot().className("image").children(children));

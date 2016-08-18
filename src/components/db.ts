@@ -41,7 +41,9 @@ const QueryCountElement = new ElementDescriptor("td").className("query-count");
 
 export const DatabaseView = new ComponentDescriptor<DB, { nameNode: VNode }>()
   .tagName("tr")
-  .createState((c, props) => ({ nameNode: DBNameElement.createVNode().children(props.name) }))
+  .init((c, props) => {
+    c.state = { nameNode: DBNameElement.createVNode().children(props.name) };
+  })
   .update((c, db, state) => {
     const topFiveQueries = db.getTopFiveQueries();
     const count = db.queries!.length;
@@ -69,5 +71,5 @@ export const DatabaseView = new ComponentDescriptor<DB, { nameNode: VNode }>()
       }
     }
 
-    c.vSync(c.createVRoot().children(children));
+    c.sync(c.createVRoot().children(children));
   });

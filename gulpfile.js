@@ -22,7 +22,7 @@ const ClosureConfig = {
 
 function clean() {
   const del = require('del');
-  return del(['build', 'dist']);
+  return del(['build', 'docs']);
 }
 
 function compileTS() {
@@ -59,29 +59,6 @@ function bundleMain(done) {
   });
 }
 
-function bundleIncremental(done) {
-  return rollup.rollup({
-    format: 'es6',
-    entry: 'build/es6/incremental.js',
-    plugins: [
-      rollupReplace({
-        delimiters: ['<@', '@>'],
-        values: {
-          KIVI_DEBUG: 'DEBUG_DISABLED',
-        },
-      }),
-      rollupNodeResolve({jsnext: true}),
-    ]
-  }).then(function(bundle) {
-    return bundle.write({
-      format: 'es',
-      dest: 'build/bundle_incremental.es6.js',
-      intro: 'goog.module("main");',
-      sourceMap: 'inline',
-    });
-  });
-}
-
 function bundle10k(done) {
   return rollup.rollup({
     format: 'es6',
@@ -105,20 +82,35 @@ function bundle10k(done) {
   });
 }
 
+function bundle10kSvg(done) {
+  return rollup.rollup({
+    format: 'es6',
+    entry: 'build/es6/10k_svg.js',
+    plugins: [
+      require('rollup-plugin-replace')({
+        delimiters: ['<@', '@>'],
+        values: {
+          KIVI_DEBUG: 'DEBUG_DISABLED',
+        },
+      }),
+      require('rollup-plugin-node-resolve')({jsnext: true}),
+    ]
+  }).then(function(bundle) {
+    return bundle.write({
+      format: 'es',
+      dest: 'build/bundle_10k_svg.es6.js',
+      intro: 'goog.module("main");',
+      sourceMap: 'inline',
+    });
+  });
+}
+
 function compileMain() {
   return gulp.src(['build/bundle.es6.js'])
       .pipe(closureCompiler(Object.assign({}, ClosureConfig, {
         js_output_file: 'bundle.js',
       })))
-      .pipe(gulp.dest('dist'));
-}
-
-function compileIncremental() {
-  return gulp.src(['build/bundle_incremental.es6.js'])
-      .pipe(closureCompiler(Object.assign({}, ClosureConfig, {
-        js_output_file: 'bundle_incremental.js',
-      })))
-      .pipe(gulp.dest('dist'));
+      .pipe(gulp.dest('docs'));
 }
 
 function compile10k() {
@@ -126,18 +118,26 @@ function compile10k() {
       .pipe(closureCompiler(Object.assign({}, ClosureConfig, {
         js_output_file: 'bundle_10k.js',
       })))
-      .pipe(gulp.dest('dist'));
+      .pipe(gulp.dest('docs'));
+}
+
+function compile10kSvg() {
+  return gulp.src(['build/bundle_10k_svg.es6.js'])
+      .pipe(closureCompiler(Object.assign({}, ClosureConfig, {
+        js_output_file: 'bundle_10k_svg.js',
+      })))
+      .pipe(gulp.dest('docs'));
 }
 
 function html() {
   return gulp.src(['./src/*.html'])
-    .pipe(gulp.dest('dist'));
+    .pipe(gulp.dest('docs'));
 }
 
 function deploy() {
   const ghPages = require('gulp-gh-pages');
 
-  return gulp.src('dist/**/*')
+  return gulp.src('docs/**/*')
     .pipe(ghPages());
 }
 
@@ -146,12 +146,12 @@ const build = gulp.series(
   html,
   compileTS,
   bundleMain,
-  bundleIncremental,
   bundle10k,
+  bundle10kSvg,
   compileMain,
-  compileIncremental,
-  compile10k);
+  compile10k,
+  compile10kSvg);
 
 exports.build = build;
 exports.build10k = gulp.series(compileTS, bundle10k, compile10k);
-exports.deploy = deploy;
+exports.build10kSvg = gulp.series(compileTS, bundle10kSvg, compile10kSvg);
