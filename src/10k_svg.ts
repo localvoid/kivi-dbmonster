@@ -31,7 +31,10 @@ function updateData(data: string[], mutations: number): void {
 
 const PixelElement = new ElementDescriptor<{x: number, y: number, fill: string}>("rect")
   .svg()
-  .className("pixel")
+  .attrs({
+    width: "4",
+    height: "4",
+  })
   .update((e, oldProps, newProps) => {
     if (oldProps === undefined) {
       (e as SVGRectElement).setAttribute("x", newProps.x.toString());
