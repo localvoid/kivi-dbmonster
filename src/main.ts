@@ -3,8 +3,32 @@ import {DBList} from "./data";
 import {Main} from "./components/main";
 import {startFPSMonitor, startMemMonitor, initProfiler, startProfile, endProfile} from "perf-monitor";
 
+function parseQueryString(a: string[]): { [key: string]: string } {
+  if (a.length === 0) {
+    return {};
+  }
+  const b = {} as { [key: string]: string };
+  for (let i = 0; i < a.length; ++i) {
+    const p = a[i].split("=", 2);
+    if (p.length === 1) {
+      b[p[0]] = "";
+    } else {
+      b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+    }
+  }
+  return b;
+}
+
 let mutations = 0.5;
-const N = 50;
+let N = 50;
+
+const qs = parseQueryString(window.location.search.substr(1).split("&"));
+if (qs["n"] !== undefined) {
+  N = parseInt(qs["n"], 10);
+}
+if (qs["m"] !== undefined) {
+  mutations = parseFloat(qs["m"]);
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   startFPSMonitor();
