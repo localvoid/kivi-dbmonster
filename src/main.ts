@@ -33,7 +33,6 @@ if (qs["m"] !== undefined) {
 document.addEventListener("DOMContentLoaded", () => {
   startFPSMonitor();
   startMemMonitor();
-  initProfiler("data update");
   initProfiler("view update");
 
   const dbs = new DBList(N);
@@ -58,10 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const c = injectComponent(Main, document.getElementById("app")!, dbs);
 
   function update() {
-    startProfile("data update");
     dbs.randomUpdate(mutations);
     c.markDirty();
-    endProfile("data update");
 
     startProfile("view update");
     c.update();

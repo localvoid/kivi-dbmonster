@@ -10,7 +10,7 @@ export const Popover = new ComponentDescriptor<string, { arrowNode: VNode }>()
   })
   .update((c, props, state) => {
     c.sync(c.createVRoot().children([
-      ContentElement.createVNode().children(props),
+      ContentElement.createVNode().child(props),
       state.arrowNode,
     ]));
   });

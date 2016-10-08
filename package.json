@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "del": "^2.2.1",
-    "google-closure-compiler": "^20160713.0.0",
+    "google-closure-compiler": "^20160911.0.0",
     "gulp": "github:gulpjs/gulp#4.0",
     "gulp-tslint": "^6.0.1",
     "gulp-typescript": "^2.13.6",

@@ -18,6 +18,7 @@ const ClosureConfig = {
   output_wrapper: '(function(){%output%}).call();',
   summary_detail_level: 3,
   warning_level: 'QUIET',
+  rewrite_polyfills: false,
 };
 
 function clean() {
